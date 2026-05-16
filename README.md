@@ -64,7 +64,7 @@ Originally built as a [PICO-8](https://www.lexaloffle.com/pico8.php) multicart d
 
 ## License
 
-Code: MIT  
+Code: [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html)  
 Icons: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)  
 Font: [SIL Open Font License](https://departuremono.com/)
 
