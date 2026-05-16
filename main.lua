@@ -773,26 +773,29 @@ function states.game:start_reveal()
     local r = self.reveal
     r.phase = PHASE_SLIDE
     r.timer = 0
-    -- store name and author separately for coloring
+    -- store name and author separately
     r.name_text = icon.name
     r.author_text = icon.author ~= "" and ("by " .. icon.author) or ""
-    -- full type text for typewriter char counting
+    -- full type text: name then author, typed as one stream
+    -- use \n as separator so we know where to line-break
     r.type_text = r.name_text
     if r.author_text ~= "" then
-        r.type_text = r.type_text .. " " .. r.author_text
+        r.type_text = r.type_text .. "\n" .. r.author_text
     end
-    -- pre-wrap full title for layout calculation
-    r.title_lines = bfont_wrap(bfont_w, r.type_text, TEXT_WIDTH)
     r.name_len = #r.name_text  -- char index where name ends
+    -- pre-wrap name and author lines separately
+    r.name_lines = bfont_wrap(bfont_w, r.name_text, TEXT_WIDTH)
+    r.author_lines = r.author_text ~= "" and bfont_wrap(bfont, r.author_text, TEXT_WIDTH) or {}
     if icon.desc ~= "" then
         r.desc_lines = bfont_wrap(bfont, icon.desc, TEXT_WIDTH)
     else
         r.desc_lines = {}
     end
     -- calculate target icon Y based on content height
-    local title_h = #r.title_lines * LINE_H
+    local name_h = #r.name_lines * LINE_H
+    local author_h = #r.author_lines * LINE_H
     local desc_h = #r.desc_lines > 0 and (#r.desc_lines * LINE_H + 3) or 0
-    local total_content = 32 + 4 + title_h + desc_h  -- icon + gap + title + desc
+    local total_content = 32 + 4 + name_h + author_h + desc_h
     r.icon_y_target = math.max(3, math.floor((VH - total_content) / 2))
     r.text_y = r.icon_y_target + 32 + 4
     sfx_reveal:stop()
@@ -861,58 +864,42 @@ function states.game:draw()
     if r.phase >= PHASE_TYPE then
         local shown = r.type_text:sub(1, r.chars_shown)
         local name_len = r.name_len
-
-        -- split shown text into name part and author part
-        local shown_name = shown:sub(1, math.min(#shown, name_len))
-        local shown_author = ""
-        if #shown > name_len then
-            shown_author = shown:sub(name_len + 1)
-        end
-
-        -- word-wrap the shown text to get line breaks
-        local shown_lines = bfont_wrap(bfont_w, shown, TEXT_WIDTH)
         local ty = r.text_y
 
-        -- render each line with color split
-        local chars_consumed = 0
-        for _, line in ipairs(shown_lines) do
-            local line_upper = string.upper(line)
-            local lw = bfont_width(bfont_w, line)
-            local lx = math.floor((VW - lw) / 2)
+        -- how many chars of name to show
+        local name_chars = math.min(r.chars_shown, name_len)
+        -- how many chars of author to show (+1 for the \n separator)
+        local author_chars = math.max(0, r.chars_shown - name_len - 1)
 
-            -- figure out where in this line the name->author boundary falls
-            local line_start = chars_consumed
-            local line_end = chars_consumed + #line
-            -- account for space between words eaten by wrapping
-            chars_consumed = line_end + 1  -- +1 for space between lines
-
-            if line_end <= name_len then
-                -- entire line is name
-                love.graphics.setColor(C.fg)
-                bfont_print(bfont_w, line, lx, ty)
-            elseif line_start >= name_len then
-                -- entire line is author (trim leading space)
-                love.graphics.setColor(C.dim)
-                bfont_print(bfont_w, line, lx, ty)
-            else
-                -- split within this line
-                local split = name_len - line_start
-                local name_part = line:sub(1, split)
-                local author_part = line:sub(split + 1)
-                love.graphics.setColor(C.fg)
-                bfont_print(bfont_w, name_part, lx, ty)
-                local nx = lx + bfont_width(bfont_w, name_part) + bfont_w.spacing
-                love.graphics.setColor(C.dim)
-                bfont_print(bfont_w, author_part, nx, ty)
+        -- draw name lines (wide font, white, centered)
+        if name_chars > 0 then
+            local shown_name = r.name_text:sub(1, name_chars)
+            local shown_name_lines = bfont_wrap(bfont_w, shown_name, TEXT_WIDTH)
+            love.graphics.setColor(C.fg)
+            for _, line in ipairs(shown_name_lines) do
+                bfont_printf(bfont_w, line, 0, ty, VW, "center")
+                ty = ty + LINE_H
             end
-            ty = ty + LINE_H
         end
-        -- use full title height for desc positioning
-        local full_ty = r.text_y + #r.title_lines * LINE_H
+        -- reserve full name height for consistent author position
+        local author_y = r.text_y + #r.name_lines * LINE_H
 
-        -- description (narrow font, centered, even dimmer)
+        -- draw author lines (narrow font, dimmed, centered)
+        if author_chars > 0 and r.author_text ~= "" then
+            local shown_author = r.author_text:sub(1, author_chars)
+            local shown_author_lines = bfont_wrap(bfont, shown_author, TEXT_WIDTH)
+            love.graphics.setColor(C.dim)
+            local ay = author_y
+            for _, line in ipairs(shown_author_lines) do
+                bfont_printf(bfont, line, 0, ay, VW, "center")
+                ay = ay + LINE_H
+            end
+        end
+
+        -- description (narrow font, even dimmer, fades in)
+        local desc_y = author_y + #r.author_lines * LINE_H
         if r.phase >= PHASE_DESC and #r.desc_lines > 0 then
-            local dy = full_ty + 3
+            local dy = desc_y + 3
             local desc_dim = 0.4 * r.desc_alpha
             love.graphics.setColor(desc_dim, desc_dim, desc_dim, r.desc_alpha)
             for _, line in ipairs(r.desc_lines) do
