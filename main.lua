@@ -16,24 +16,192 @@ local C = {
     accent   = {0x35/255, 0x84/255, 0xe4/255},
 }
 
+-- bitmap font system
+function load_bfont(path, variant)
+    local f = {}
+    f.image = love.graphics.newImage(path)
+    f.image:setFilter("nearest", "nearest")
+    f.height = 5
+    f.spacing = 1  -- 1px between characters
+    f.glyphs = {}
+
+    local g = f.glyphs
+
+    if variant == "wide" then
+        -- Wide font glyph map
+        g["A"]={1,1,4}  g["B"]={6,1,4}  g["C"]={11,1,4} g["D"]={16,1,4}
+        g["E"]={21,1,4} g["F"]={26,1,4}
+        g["G"]={1,7,4}  g["H"]={6,7,4}  g["I"]={11,7,1} g["J"]={13,7,4}
+        g["K"]={18,7,4} g["L"]={23,7,4}
+        g["M"]={1,13,5} g["N"]={7,13,4} g["O"]={12,13,4} g["P"]={17,13,4}
+        g["Q"]={22,13,4} g["R"]={27,13,4}
+        g["S"]={1,19,4} g["T"]={6,19,5} g["U"]={12,19,4} g["V"]={17,19,4}
+        g["W"]={22,19,7}
+        g["X"]={1,25,4} g["Y"]={6,25,4} g["Z"]={11,25,4}
+        g["0"]={1,31,4} g["1"]={6,31,2} g["2"]={9,31,4} g["3"]={14,31,4}
+        g["4"]={19,31,4} g["5"]={24,31,4}
+        g["6"]={1,37,4} g["7"]={6,37,4} g["8"]={11,37,4} g["9"]={16,37,4}
+        g[":"]={2,43,1} g["."]={4,43,1} g[","]={6,43,2}
+        g["/"]={10,43,1} g["!"]={12,43,1}
+        g["<"]={14,43,4} g[">"]={19,43,3} g["?"]={23,43,3}
+        g[" "]={0,0,3}   -- wider space for wide font
+        g["-"]={0,0,4, synthetic="dash"}
+    else
+        -- Narrow font glyph map
+        g["A"]={1,1,3}  g["B"]={5,1,3}  g["C"]={9,1,3}  g["D"]={13,1,3}
+        g["E"]={17,1,3} g["F"]={21,1,3} g["G"]={25,1,3}
+        g["H"]={1,7,3}  g["I"]={5,7,1}  g["J"]={7,7,2}  g["K"]={10,7,3}
+        g["L"]={14,7,3} g["M"]={18,7,5} g["N"]={24,7,4}
+        g["O"]={1,13,3} g["P"]={5,13,3} g["Q"]={9,13,3} g["R"]={13,13,3}
+        g["S"]={17,13,3} g["T"]={21,13,3} g["U"]={25,13,3}
+        g["V"]={1,19,3} g["W"]={5,19,5} g["X"]={11,19,3}
+        g["Y"]={15,19,3} g["Z"]={19,19,3}
+        g["0"]={1,25,3} g["1"]={5,25,2} g["2"]={8,25,3} g["3"]={12,25,3}
+        g["4"]={16,25,3} g["5"]={20,25,3} g["6"]={24,25,3}
+        g["7"]={1,31,3} g["8"]={5,31,3} g["9"]={9,31,3}
+        g[":"]={2,37,1} g["."]={4,37,1} g[","]={6,37,2}
+        g["/"]={10,37,1} g["?"]={14,37,3}
+        g["<"]={18,37,3} g[">"]={22,37,3}
+        -- Button glyphs (narrow font only)
+        g["\1"]={1,45,5}  g["\2"]={7,45,5}  g["\3"]={13,45,5}
+        g["\4"]={19,45,5} g["\5"]={25,45,5}
+        g["\6"]={1,51,5}
+        g[" "]={0,0,2}
+        g["-"]={0,0,3, synthetic="dash"}
+    end
+
+    -- build quads
+    local iw, ih = f.image:getDimensions()
+    for ch, d in pairs(g) do
+        if ch ~= " " and not d.synthetic then
+            d.quad = love.graphics.newQuad(d[1], d[2], d[3], 5, iw, ih)
+        end
+    end
+
+    return f
+end
+
+-- measure text width in pixels
+function bfont_width(font, text)
+    text = string.upper(text)
+    local w = 0
+    for i = 1, #text do
+        local ch = text:sub(i, i)
+        local g = font.glyphs[ch]
+        if g then
+            w = w + g[3] + font.spacing
+        else
+            w = w + 3 + font.spacing  -- fallback width
+        end
+    end
+    return math.max(0, w - font.spacing)  -- no trailing space
+end
+
+-- draw text at (x, y)
+function bfont_print(font, text, x, y)
+    text = string.upper(text)
+    local cx = x
+    for i = 1, #text do
+        local ch = text:sub(i, i)
+        local g = font.glyphs[ch]
+        if g and g.synthetic == "dash" then
+            love.graphics.rectangle("fill", math.floor(cx), math.floor(y) + 2, g[3], 1)
+            cx = cx + g[3] + font.spacing
+        elseif g and ch ~= " " and g.quad then
+            love.graphics.draw(font.image, g.quad, math.floor(cx), math.floor(y))
+            cx = cx + g[3] + font.spacing
+        elseif g then
+            cx = cx + g[3] + font.spacing  -- space
+        else
+            cx = cx + 3 + font.spacing  -- unknown char
+        end
+    end
+end
+
+-- draw text centered in a width
+function bfont_printf(font, text, x, y, w, align)
+    local tw = bfont_width(font, text)
+    local ox = x
+    if align == "center" then
+        ox = x + math.floor((w - tw) / 2)
+    elseif align == "right" then
+        ox = x + w - tw
+    end
+    bfont_print(font, text, ox, y)
+end
+
+-- draw styled text: segments = {{text, {r,g,b,a}}, ...}
+-- renders segments in sequence, each with its own color
+function bfont_print_styled(font, segments, x, y)
+    local cx = x
+    for _, seg in ipairs(segments) do
+        local text, color = seg[1], seg[2]
+        love.graphics.setColor(color)
+        bfont_print(font, text, cx, y)
+        cx = cx + bfont_width(font, text) + font.spacing
+    end
+end
+
+-- draw styled text centered
+function bfont_printf_styled(font, segments, x, y, w, align)
+    -- measure total width
+    local tw = 0
+    for i, seg in ipairs(segments) do
+        tw = tw + bfont_width(font, seg[1])
+        if i < #segments then tw = tw + font.spacing end
+    end
+    local ox = x
+    if align == "center" then
+        ox = x + math.floor((w - tw) / 2)
+    elseif align == "right" then
+        ox = x + w - tw
+    end
+    bfont_print_styled(font, segments, ox, y)
+end
+
+-- word-wrap text for bitmap font
+function bfont_wrap(font, text, max_width)
+    local words = {}
+    for w in text:gmatch("%S+") do table.insert(words, w) end
+    local lines = {}
+    local line = ""
+    local line_w = 0
+    for _, word in ipairs(words) do
+        local word_w = bfont_width(font, word)
+        local sep_w = line ~= "" and (font.glyphs[" "] and font.glyphs[" "][3] + font.spacing or 3) or 0
+        if line_w + sep_w + word_w <= max_width then
+            line = line .. (line ~= "" and " " or "") .. word
+            line_w = line_w + sep_w + word_w
+        else
+            if line ~= "" then table.insert(lines, line) end
+            line = word
+            line_w = word_w
+        end
+    end
+    if line ~= "" then table.insert(lines, line) end
+    return lines
+end
+
 -- canvases
 local vcanvas = nil    -- main 128×128 virtual screen
 local icon_canvas = nil -- 32×32 icon for shader effects
 
--- fonts
-local font_sm = nil    -- small (counter, nav)
-local font_md = nil    -- medium (labels, intro)
+-- bitmap fonts
+local bfont = nil      -- narrow 5px bitmap font (descriptions)
+local bfont_w = nil    -- wide 5px bitmap font (titles)
 
 -- shaders
 local glitch_shader = nil
 local transition_shader = nil
 local crt_shader = nil
+local crt_enabled = true
 
 -- sound effects
 local sfx_swoosh = nil
 local sfx_glitch = nil
 local sfx_reveal = nil
 local sfx_bump = nil
+local sfx_type = nil
 
 -- state machine
 local states = {}
@@ -49,6 +217,7 @@ end
 -- icon data
 local icons = {}
 local icon_count = 0
+local meta = {}  -- appstream metadata
 
 -- intro logo
 local logo_top = nil
@@ -75,17 +244,16 @@ function love.load()
     sfx_reveal:setVolume(0.4)
     sfx_bump = love.audio.newSource("assets/sfx/bump.wav", "static")
     sfx_bump:setVolume(0.6)
+    sfx_type = love.audio.newSource("assets/sfx/type_loop.wav", "static")
+    sfx_type:setVolume(0.25)
+    sfx_type:setLooping(true)
 
     -- load shaders
     load_shaders()
 
-    -- load fonts — Departure Mono
-    -- size 11 gives cap height = 8px (pixel-clean)
-    local fpath = "assets/fonts/DepartureMono.otf"
-    font_sm = love.graphics.newFont(fpath, 11)
-    font_md = love.graphics.newFont(fpath, 11)
-    font_sm:setFilter("nearest", "nearest")
-    font_md:setFilter("nearest", "nearest")
+    -- load bitmap fonts
+    bfont = load_bfont("assets/fonts/5allcaps-narrow.png", "narrow")
+    bfont_w = load_bfont("assets/fonts/5allcaps.png", "wide")
 
     -- load logo halves
     local logo_img = love.graphics.newImage("assets/logo.png")
@@ -120,7 +288,7 @@ function love.draw()
 
     -- draw virtual canvas scaled up to screen, centered
     love.graphics.setColor(1, 1, 1)
-    if crt_shader then
+    if crt_enabled and crt_shader then
         crt_shader:send("scale", SCALE * 1.0)
         love.graphics.setShader(crt_shader)
     end
@@ -132,12 +300,18 @@ function love.keypressed(key)
     if key == "escape" then
         love.event.quit()
     end
+    if key == "tab" then
+        crt_enabled = not crt_enabled
+    end
     if current_state and current_state.keypressed then
         current_state:keypressed(key)
     end
 end
 
 function love.gamepadpressed(joystick, button)
+    if button == "back" then  -- SELECT / SE button
+        crt_enabled = not crt_enabled
+    end
     if current_state and current_state.gamepadpressed then
         current_state:gamepadpressed(joystick, button)
     end
@@ -147,6 +321,15 @@ end
 -- ICON LOADING
 ------------------------------------------------------------
 function load_icons()
+    -- load metadata sidecar
+    local ok, m = pcall(love.filesystem.load, "assets/meta.lua")
+    if ok and m then
+        local ok2, result = pcall(m)
+        if ok2 and type(result) == "table" then
+            meta = result
+        end
+    end
+
     local dir = "assets/icons"
     local files = love.filesystem.getDirectoryItems(dir)
     table.sort(files)
@@ -155,8 +338,17 @@ function load_icons()
         if file:match("%.png$") then
             local path = dir .. "/" .. file
             local img = love.graphics.newImage(path)
-            local name = file:gsub("%.png$", ""):gsub("[-_.]", " ")
-            table.insert(icons, {image = img, label = name})
+            local key = file:gsub("%.png$", "")
+            local m = meta[key]
+            local entry = {
+                image = img,
+                key = key,
+                label = key:gsub("[-_.]", " "),
+                name = m and m.name or key:gsub("[-_.]", " "),
+                author = m and m.author or "",
+                desc = m and m.desc or "",
+            }
+            table.insert(icons, entry)
         end
     end
 
@@ -389,9 +581,8 @@ function states.intro:draw()
         if self.t > self.duration - 0.5 then
             alpha = math.max((self.duration - self.t) / 0.5, 0)
         end
-        love.graphics.setFont(font_sm)
         love.graphics.setColor(C.dim[1], C.dim[2], C.dim[3], alpha)
-        love.graphics.printf("jimmac.eu", 0, logo_y + 20, VW, "center")
+        bfont_printf(bfont, "jimmac.eu", 0, logo_y + 20, VW, "center")
     end
 end
 
@@ -408,31 +599,55 @@ end
 ------------------------------------------------------------
 states.game = {}
 
--- icon is 32×32, drawn at 1:1 on the 128×128 canvas
-local ICON_X = (VW - 32) / 2   -- 48
-local ICON_Y = (VH - 32) / 2 - 8  -- centered, nudged up for label
+-- icon layout constants
+local ICON_X = (VW - 32) / 2       -- 48, centered
+local ICON_Y_CENTER = (VH - 32) / 2 - 4  -- quiz position (centered)
+local TEXT_MARGIN = 4
+local TEXT_WIDTH = VW - TEXT_MARGIN * 2
+local LINE_H = 7                    -- 5px font + 2px gap
+
+-- reveal phases
+local PHASE_IDLE = 0     -- icon centered, waiting for guess
+local PHASE_SLIDE = 1    -- icon sliding to top
+local PHASE_TYPE = 2     -- typewriter name + author
+local PHASE_DESC = 3     -- description fades in
 
 function states.game:enter()
     self.index = 1
-    self.revealed = false
     self.input_delay = 0
     self.repeat_rate = 0.15
 
-    -- transition
+    -- transition (icon change glitch)
     self.trans = {active = false, timer = 0, duration = 0.5, seed = 0}
 
-    -- glitch
+    -- ambient glitch
     self.glitch = {
         active = false, timer = 0, duration = 0,
         next_trigger = 3 + math.random() * 7,
         elapsed = 0,
     }
+
+    -- reveal animation
+    self.reveal = {
+        phase = PHASE_IDLE,
+        timer = 0,
+        icon_y = ICON_Y_CENTER,
+        chars_shown = 0,
+        type_text = "",       -- full text to type (name + by author)
+        title_lines = {},     -- pre-wrapped title lines
+        desc_lines = {},      -- word-wrapped description
+        desc_alpha = 0,
+        last_char_tick = 0,   -- timer for typewriter sound rate-limiting
+        icon_y_target = ICON_Y_CENTER,
+        text_y = 0,
+    }
 end
 
 function states.game:update(dt)
     self.input_delay = math.max(self.input_delay - dt, 0)
+    local r = self.reveal
 
-    -- keyboard
+    -- keyboard held-nav
     if self.input_delay <= 0 then
         if love.keyboard.isDown("right") then
             self:go(1)
@@ -441,7 +656,7 @@ function states.game:update(dt)
         end
     end
 
-    -- gamepad
+    -- gamepad held-nav
     if self.input_delay <= 0 then
         for _, js in ipairs(love.joystick.getJoysticks()) do
             if js:isGamepad() then
@@ -479,6 +694,43 @@ function states.game:update(dt)
             sfx_glitch:play()
         end
     end
+
+    -- reveal animation phases
+    if r.phase == PHASE_SLIDE then
+        r.timer = r.timer + dt
+        -- ease icon to calculated position
+        r.icon_y = r.icon_y - (r.icon_y - r.icon_y_target) / 4
+        if math.abs(r.icon_y - r.icon_y_target) < 0.5 then
+            r.icon_y = r.icon_y_target
+            r.phase = PHASE_TYPE
+            r.timer = 0
+            r.chars_shown = 0
+        end
+
+    elseif r.phase == PHASE_TYPE then
+        r.timer = r.timer + dt
+        -- ~2 chars per frame at 30fps ≈ 60 chars/sec
+        local new_chars = math.floor(r.timer * 50)
+        if new_chars > r.chars_shown then
+            -- play tick sound (rate-limited)
+            -- start type loop if not already playing
+            if not sfx_type:isPlaying() then
+                sfx_type:play()
+            end
+            r.chars_shown = new_chars
+        end
+        if r.chars_shown >= #r.type_text then
+            r.chars_shown = #r.type_text
+            r.phase = PHASE_DESC
+            r.timer = 0
+            r.desc_alpha = 0
+            sfx_type:stop()
+        end
+
+    elseif r.phase == PHASE_DESC then
+        r.timer = r.timer + dt
+        r.desc_alpha = math.min(r.timer / 0.4, 1)  -- fade in over 0.4s
+    end
 end
 
 function states.game:go(dir)
@@ -486,30 +738,70 @@ function states.game:go(dir)
     if ni < 1 then ni = icon_count end
     if ni > icon_count then ni = 1 end
     self.index = ni
-    self.revealed = false
     self.input_delay = self.repeat_rate
     self.trans.active = true
     self.trans.timer = self.trans.duration
     self.trans.seed = math.random() * 1000
     sfx_swoosh:stop()
     sfx_swoosh:play()
+    -- reset reveal
+    self.reveal.phase = PHASE_IDLE
+    self.reveal.icon_y = ICON_Y_CENTER
+    self.reveal.chars_shown = 0
+    self.reveal.desc_alpha = 0
+    sfx_type:stop()
 end
 
 function states.game:jump_random()
     self.index = math.random(1, icon_count)
-    self.revealed = false
     self.trans.active = true
     self.trans.timer = self.trans.duration
     self.trans.seed = math.random() * 1000
     sfx_swoosh:stop()
     sfx_swoosh:play()
+    -- reset reveal
+    self.reveal.phase = PHASE_IDLE
+    self.reveal.icon_y = ICON_Y_CENTER
+    self.reveal.chars_shown = 0
+    sfx_type:stop()
+    self.reveal.desc_alpha = 0
+end
+
+function states.game:start_reveal()
+    if self.reveal.phase ~= PHASE_IDLE then return end
+    local icon = icons[self.index]
+    local r = self.reveal
+    r.phase = PHASE_SLIDE
+    r.timer = 0
+    -- store name and author separately for coloring
+    r.name_text = icon.name
+    r.author_text = icon.author ~= "" and ("by " .. icon.author) or ""
+    -- full type text for typewriter char counting
+    r.type_text = r.name_text
+    if r.author_text ~= "" then
+        r.type_text = r.type_text .. " " .. r.author_text
+    end
+    -- pre-wrap full title for layout calculation
+    r.title_lines = bfont_wrap(bfont_w, r.type_text, TEXT_WIDTH)
+    r.name_len = #r.name_text  -- char index where name ends
+    if icon.desc ~= "" then
+        r.desc_lines = bfont_wrap(bfont, icon.desc, TEXT_WIDTH)
+    else
+        r.desc_lines = {}
+    end
+    -- calculate target icon Y based on content height
+    local title_h = #r.title_lines * LINE_H
+    local desc_h = #r.desc_lines > 0 and (#r.desc_lines * LINE_H + 3) or 0
+    local total_content = 32 + 4 + title_h + desc_h  -- icon + gap + title + desc
+    r.icon_y_target = math.max(3, math.floor((VH - total_content) / 2))
+    r.text_y = r.icon_y_target + 32 + 4
+    sfx_reveal:stop()
+    sfx_reveal:play()
 end
 
 function states.game:keypressed(key)
     if key == "x" or key == "return" then
-        self.revealed = true
-        sfx_reveal:stop()
-        sfx_reveal:play()
+        self:start_reveal()
     elseif key == "z" or key == "space" then
         self:jump_random()
     end
@@ -517,9 +809,7 @@ end
 
 function states.game:gamepadpressed(joystick, button)
     if button == "a" then
-        self.revealed = true
-        sfx_reveal:stop()
-        sfx_reveal:play()
+        self:start_reveal()
     elseif button == "b" then
         self:jump_random()
     end
@@ -528,55 +818,114 @@ end
 function states.game:draw()
     if icon_count == 0 then
         love.graphics.setColor(C.fg)
-        love.graphics.setFont(font_sm)
-        love.graphics.printf("no icons found", 0, VH/2, VW, "center")
+        bfont_printf(bfont, "no icons found", 0, VH/2, VW, "center")
         return
     end
 
     local icon = icons[self.index]
+    local r = self.reveal
+    local icon_y = math.floor(r.icon_y)
 
     -- draw icon to 32×32 canvas
     love.graphics.setCanvas(icon_canvas)
     love.graphics.clear(0, 0, 0, 0)
     love.graphics.setColor(1, 1, 1)
     love.graphics.draw(icon.image, 0, 0)
-    love.graphics.setCanvas(vcanvas)  -- back to virtual canvas
+    love.graphics.setCanvas(vcanvas)
 
-    -- draw icon with shader effects at 1:1 on the 128×128 canvas
+    -- draw icon with shader effects
     love.graphics.setColor(1, 1, 1)
     if self.trans.active and transition_shader then
         local p = 1 - self.trans.timer / self.trans.duration
         transition_shader:send("time", p)
         transition_shader:send("seed", self.trans.seed)
         love.graphics.setShader(transition_shader)
-        love.graphics.draw(icon_canvas, ICON_X, ICON_Y)
+        love.graphics.draw(icon_canvas, ICON_X, icon_y)
         love.graphics.setShader()
     elseif self.glitch.active and glitch_shader then
         local intensity = math.min(self.glitch.timer / self.glitch.duration, 1)
         glitch_shader:send("time", love.timer.getTime())
         glitch_shader:send("intensity", intensity)
         love.graphics.setShader(glitch_shader)
-        love.graphics.draw(icon_canvas, ICON_X, ICON_Y)
+        love.graphics.draw(icon_canvas, ICON_X, icon_y)
         love.graphics.setShader()
     else
-        love.graphics.draw(icon_canvas, ICON_X, ICON_Y)
+        love.graphics.draw(icon_canvas, ICON_X, icon_y)
     end
 
-    -- counter
-    love.graphics.setFont(font_sm)
+    -- counter (always at top)
     love.graphics.setColor(C.dim)
-    love.graphics.printf(self.index .. "/" .. icon_count, 0, 3, VW, "center")
+    bfont_printf(bfont, self.index .. "/" .. icon_count, 0, VH - 8, VW, "center")
 
-    -- label
-    if self.revealed then
-        love.graphics.setFont(font_md)
-        love.graphics.setColor(C.fg)
-        love.graphics.printf(icon.label, 0, ICON_Y + 37, VW, "center")
+    -- reveal text
+    if r.phase >= PHASE_TYPE then
+        local shown = r.type_text:sub(1, r.chars_shown)
+        local name_len = r.name_len
+
+        -- split shown text into name part and author part
+        local shown_name = shown:sub(1, math.min(#shown, name_len))
+        local shown_author = ""
+        if #shown > name_len then
+            shown_author = shown:sub(name_len + 1)
+        end
+
+        -- word-wrap the shown text to get line breaks
+        local shown_lines = bfont_wrap(bfont_w, shown, TEXT_WIDTH)
+        local ty = r.text_y
+
+        -- render each line with color split
+        local chars_consumed = 0
+        for _, line in ipairs(shown_lines) do
+            local line_upper = string.upper(line)
+            local lw = bfont_width(bfont_w, line)
+            local lx = math.floor((VW - lw) / 2)
+
+            -- figure out where in this line the name->author boundary falls
+            local line_start = chars_consumed
+            local line_end = chars_consumed + #line
+            -- account for space between words eaten by wrapping
+            chars_consumed = line_end + 1  -- +1 for space between lines
+
+            if line_end <= name_len then
+                -- entire line is name
+                love.graphics.setColor(C.fg)
+                bfont_print(bfont_w, line, lx, ty)
+            elseif line_start >= name_len then
+                -- entire line is author (trim leading space)
+                love.graphics.setColor(C.dim)
+                bfont_print(bfont_w, line, lx, ty)
+            else
+                -- split within this line
+                local split = name_len - line_start
+                local name_part = line:sub(1, split)
+                local author_part = line:sub(split + 1)
+                love.graphics.setColor(C.fg)
+                bfont_print(bfont_w, name_part, lx, ty)
+                local nx = lx + bfont_width(bfont_w, name_part) + bfont_w.spacing
+                love.graphics.setColor(C.dim)
+                bfont_print(bfont_w, author_part, nx, ty)
+            end
+            ty = ty + LINE_H
+        end
+        -- use full title height for desc positioning
+        local full_ty = r.text_y + #r.title_lines * LINE_H
+
+        -- description (narrow font, centered, even dimmer)
+        if r.phase >= PHASE_DESC and #r.desc_lines > 0 then
+            local dy = full_ty + 3
+            local desc_dim = 0.4 * r.desc_alpha
+            love.graphics.setColor(desc_dim, desc_dim, desc_dim, r.desc_alpha)
+            for _, line in ipairs(r.desc_lines) do
+                bfont_printf(bfont, line, 0, dy, VW, "center")
+                dy = dy + LINE_H
+            end
+        end
     end
 
-    -- nav hints
-    love.graphics.setFont(font_md)
-    love.graphics.setColor(C.dim[1], C.dim[2], C.dim[3], 0.3)
-    love.graphics.print("<", 4, VH/2 - 6)
-    love.graphics.print(">", VW - 12, VH/2 - 6)
+    -- nav hints (only when not revealed)
+    if r.phase == PHASE_IDLE then
+        love.graphics.setColor(C.dim[1], C.dim[2], C.dim[3], 0.3)
+        bfont_print(bfont, "<", 4, VH/2 - 3)
+        bfont_print(bfont, ">", VW - 7, VH/2 - 3)
+    end
 end

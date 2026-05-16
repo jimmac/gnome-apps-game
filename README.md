@@ -62,7 +62,6 @@ The placeholder WAVs in `assets/sfx/` can be replaced with custom [sfxr](https:/
 ## License
 
 Code: [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html)  
-Icons: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)  
-Font: [SIL Open Font License](https://departuremono.com/)
+Icons: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 
 
 *jimmac.eu*
