@@ -206,6 +206,11 @@ local sfx_type = nil
 -- state machine
 local states = {}
 local current_state = nil
+local prev_state_name = nil  -- for returning from screensaver
+
+-- idle tracking
+local idle_timer = 0
+local IDLE_TIMEOUT = 60  -- seconds before screensaver
 
 function set_state(name, ...)
     current_state = states[name]
@@ -275,6 +280,15 @@ function love.update(dt)
     if current_state and current_state.update then
         current_state:update(dt)
     end
+
+    -- idle timer (only in game state)
+    if current_state == states.game then
+        idle_timer = idle_timer + dt
+        if idle_timer >= IDLE_TIMEOUT then
+            prev_state_name = "game"
+            set_state("screensaver")
+        end
+    end
 end
 
 function love.draw()
@@ -297,6 +311,7 @@ function love.draw()
 end
 
 function love.keypressed(key)
+    idle_timer = 0
     if key == "escape" then
         love.event.quit()
     end
@@ -309,6 +324,7 @@ function love.keypressed(key)
 end
 
 function love.gamepadpressed(joystick, button)
+    idle_timer = 0
     if button == "back" then  -- SELECT / SE button
         crt_enabled = not crt_enabled
     end
@@ -914,5 +930,86 @@ function states.game:draw()
         love.graphics.setColor(C.dim[1], C.dim[2], C.dim[3], 0.3)
         bfont_print(bfont, "<", 4, VH/2 - 3)
         bfont_print(bfont, ">", VW - 7, VH/2 - 3)
+    end
+end
+
+------------------------------------------------------------
+-- SCREENSAVER STATE
+------------------------------------------------------------
+states.screensaver = {}
+
+local SS_GRID = 36         -- icon cell size (32px icon + 4px gap)
+local SS_SPEED_X = -3      -- pixels/sec horizontal drift (negative = left)
+local SS_SPEED_Y = 10      -- pixels/sec vertical scroll
+
+function states.screensaver:enter()
+    self.t = 0
+    self.fade_in = 0
+    self.scroll_x = 0
+    self.scroll_y = 0
+
+    -- shuffle icon indices
+    self.order = {}
+    for i = 1, icon_count do
+        table.insert(self.order, i)
+    end
+    for i = #self.order, 2, -1 do
+        local j = math.random(1, i)
+        self.order[i], self.order[j] = self.order[j], self.order[i]
+    end
+
+    -- grid: enough columns/rows to tile with wrapping
+    self.cols = math.ceil(VW / SS_GRID) + 2
+    self.rows = math.ceil(VH / SS_GRID) + 2
+end
+
+function states.screensaver:update(dt)
+    self.t = self.t + dt
+    self.fade_in = math.min(self.t / 1.5, 1)
+    self.scroll_x = self.scroll_x + SS_SPEED_X * dt
+    self.scroll_y = self.scroll_y + SS_SPEED_Y * dt
+end
+
+function states.screensaver:draw()
+    local alpha = self.fade_in * 0.6
+    local cols = self.cols
+    local rows = self.rows
+
+    -- offset within one cell
+    local ox = self.scroll_x % SS_GRID
+    local oy = self.scroll_y % SS_GRID
+    -- which cell is at top-left
+    local base_col = math.floor(self.scroll_x / SS_GRID)
+    local base_row = math.floor(self.scroll_y / SS_GRID)
+
+    for r = -1, rows do
+        for c = -1, cols do
+            -- stable grid cell index (wraps through icon pool)
+            local gc = (c + base_col) % 256
+            local gr = (r + base_row) % 256
+            -- hash to a shuffled icon
+            local idx = ((gr * 17 + gc * 31) % icon_count) + 1
+            local icon = icons[self.order[idx]]
+
+            if icon then
+                local x = c * SS_GRID - ox
+                local y = r * SS_GRID - oy
+                love.graphics.setColor(1, 1, 1, alpha)
+                love.graphics.draw(icon.image, math.floor(x), math.floor(y))
+            end
+        end
+    end
+end
+
+function states.screensaver:keypressed(key)
+    -- any key returns to game
+    if key ~= "tab" then
+        set_state(prev_state_name or "game")
+    end
+end
+
+function states.screensaver:gamepadpressed(joystick, button)
+    if button ~= "back" then
+        set_state(prev_state_name or "game")
     end
 end
