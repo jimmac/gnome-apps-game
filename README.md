@@ -16,10 +16,6 @@ Icons are displayed one at a time on a virtual 128×128 pixel canvas scaled up t
 
 Built with [LÖVE 2D](https://love2d.org/) (11.5) — a Lua game framework. The game renders to a tiny 128×128 virtual canvas, then scales 5× with nearest-neighbor filtering for a crisp pixel art aesthetic. GPU shaders handle the CRT overlay, transition effects, and glitch distortions.
 
-### Font
-
-[Departure Mono](https://departuremono.com/) — a pixel-perfect monospace font.
-
 ### Icons
 
 32×32 RGBA PNGs of GNOME application icons, rendered from the [GNOME HIG](https://developer.gnome.org/hig/) icon set. Licensed under CC BY-SA 4.0.
@@ -58,9 +54,10 @@ The placeholder WAVs in `assets/sfx/` can be replaced with custom [sfxr](https:/
 | `glitch.wav` | Random ambient glitch | 15% |
 | `reveal.wav` | Name reveal | 40% |
 
-## Origin
+## Plans
+* [ ] Create a custom font
+* [ ] Sidecar metadata. Present author and description from flathub/appstream.
 
-Originally built as a [PICO-8](https://www.lexaloffle.com/pico8.php) multicart demo, ported to LÖVE 2D to fit all 166 icons in a single distributable file and run natively on ARM handhelds.
 
 ## License
 

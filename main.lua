@@ -33,6 +33,7 @@ local crt_shader = nil
 local sfx_swoosh = nil
 local sfx_glitch = nil
 local sfx_reveal = nil
+local sfx_bump = nil
 
 -- state machine
 local states = {}
@@ -48,6 +49,10 @@ end
 -- icon data
 local icons = {}
 local icon_count = 0
+
+-- intro logo
+local logo_top = nil
+local logo_bot = nil
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -68,6 +73,8 @@ function love.load()
     sfx_glitch:setVolume(0.15)
     sfx_reveal = love.audio.newSource("assets/sfx/reveal.wav", "static")
     sfx_reveal:setVolume(0.4)
+    sfx_bump = love.audio.newSource("assets/sfx/bump.wav", "static")
+    sfx_bump:setVolume(0.6)
 
     -- load shaders
     load_shaders()
@@ -79,6 +86,15 @@ function love.load()
     font_md = love.graphics.newFont(fpath, 11)
     font_sm:setFilter("nearest", "nearest")
     font_md:setFilter("nearest", "nearest")
+
+    -- load logo halves
+    local logo_img = love.graphics.newImage("assets/logo.png")
+    -- top half: 16×8 from y=0
+    logo_top = love.graphics.newQuad(0, 0, 16, 8, 16, 16)
+    -- bottom half: 16×8 from y=8
+    logo_bot = love.graphics.newQuad(0, 8, 16, 8, 16, 16)
+    -- store full image for drawing
+    logo_image = logo_img
 
     -- load icons
     load_icons()
@@ -320,25 +336,63 @@ states.intro = {}
 
 function states.intro:enter()
     self.t = 0
-    self.duration = 2.5
+    self.delay = 1.0          -- pause before animation starts
+    self.duration = 4.5       -- total time including delay
+    self.x_top = -16          -- start off-screen left
+    self.x_bot = VW           -- start off-screen right
+    self.target_x = (VW - 16) / 2
+    self.bumped = false
 end
 
 function states.intro:update(dt)
     self.t = self.t + dt
+    local at = self.t - self.delay  -- animation time
+    if at > 0 then
+        -- ease in (faster approach)
+        self.x_top = self.x_top - (self.x_top - self.target_x) / 3
+        self.x_bot = self.x_bot - (self.x_bot - self.target_x) / 3
+        -- snap when close enough
+        if math.abs(self.x_top - self.target_x) < 0.5 then
+            self.x_top = self.target_x
+            self.x_bot = self.target_x
+            if not self.bumped then
+                self.bumped = true
+                sfx_bump:stop()
+                sfx_bump:play()
+            end
+        end
+    end
     if self.t > self.duration then
         set_state("game")
     end
 end
 
 function states.intro:draw()
-    local alpha = math.min(self.t / 0.8, 1)
-    if self.t > self.duration - 0.5 then
-        alpha = math.max((self.duration - self.t) / 0.5, 0)
+    local at = self.t - self.delay
+    if at < 0 then return end  -- still in delay
+
+    local logo_y = VH/2 - 16
+
+    -- draw two halves easing in
+    love.graphics.setColor(1, 1, 1)
+    if at < 0.8 then
+        love.graphics.draw(logo_image, logo_top, math.floor(self.x_top), logo_y)
+        love.graphics.draw(logo_image, logo_bot, math.floor(self.x_bot), logo_y + 8)
+    else
+        love.graphics.draw(logo_image, logo_top, math.floor(self.target_x), logo_y)
+        love.graphics.draw(logo_image, logo_bot, math.floor(self.target_x), logo_y + 8)
     end
 
-    love.graphics.setFont(font_md)
-    love.graphics.setColor(C.dim[1], C.dim[2], C.dim[3], alpha)
-    love.graphics.printf("jimmac.eu", 0, VH/2 - 6, VW, "center")
+    -- "jimmac.eu" text fades in after logo settles
+    if at > 0.8 then
+        local alpha = math.min((at - 0.8) / 0.5, 1)
+        if self.t > self.duration - 0.5 then
+            alpha = math.max((self.duration - self.t) / 0.5, 0)
+        end
+        love.graphics.setFont(font_sm)
+        love.graphics.setColor(C.dim[1], C.dim[2], C.dim[3], alpha)
+        love.graphics.printf("jimmac.eu", 0, logo_y + 20, VW, "center")
+    end
 end
 
 function states.intro:keypressed(key)
