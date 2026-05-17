@@ -1,0 +1,394 @@
+/* Flathub Arcade — Mobile-first, modern CSS */
+
+/* ── Variables ── */
+:root {
+  --blue-3: #3584e4;
+  --blue-4: #1c71d8;
+  --blue-5: #1a5fb4;
+  --dark-1: #77767b;
+  --dark-3: #3d3846;
+  --dark-4: #241f31;
+  --dark-5: #1e1e1e;
+  --light-1: #ffffff;
+  --light-2: #f6f5f4;
+  --light-3: #deddda;
+  --green-4: #26a269;
+  --yellow-3: #f5c211;
+  --orange-3: #ff7800;
+
+  --bg: var(--dark-5);
+  --bg-surface: #2a2a2a;
+  --bg-card: #333;
+  --text: var(--light-2);
+  --text-muted: var(--dark-1);
+  --accent: var(--blue-3);
+  --accent-hover: var(--blue-4);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --max-width: 900px;
+  --font: "Inter", system-ui, sans-serif;
+  --transition: 0.2s ease;
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base ── */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100dvh;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--transition);
+
+  &:hover {
+    color: var(--accent-hover);
+  }
+}
+
+/* ── Layout ── */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+/* ── Header ── */
+.site-header {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  & .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  & .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text);
+
+    & img {
+      width: 28px;
+      height: 28px;
+      image-rendering: pixelated;
+    }
+  }
+
+  & nav {
+    display: flex;
+    gap: 1.5rem;
+
+    & a {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+
+      &:hover {
+        color: var(--text);
+      }
+    }
+  }
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 3rem 0 2rem;
+  text-align: center;
+
+  & .hero-image {
+    margin: 0 auto 2rem;
+    max-width: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    & img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+  }
+
+  & h1 {
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  & .tagline {
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+
+  & .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: var(--light-1);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background var(--transition), transform var(--transition);
+
+    &:hover {
+      background: var(--accent-hover);
+      color: var(--light-1);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+/* ── About ── */
+.about {
+  padding: 3rem 0;
+
+  & h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  & p {
+    color: var(--text-muted);
+    max-width: 65ch;
+  }
+
+  & .features {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  & .feature {
+    background: var(--bg-surface);
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    & .emoji {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    & h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    & p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+  }
+}
+
+/* ── Downloads ── */
+.downloads {
+  padding: 3rem 0;
+
+  & h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  & .subtitle {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+
+  & .version-badge {
+    display: inline-block;
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  & .download-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  & .download-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--bg-surface);
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: border-color var(--transition), transform var(--transition);
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    & .platform-icon {
+      font-size: 1.75rem;
+      flex-shrink: 0;
+      width: 2.5rem;
+      text-align: center;
+    }
+
+    & .platform-info {
+      flex: 1;
+
+      & h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.125rem;
+      }
+
+      & p {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+    }
+
+    & .download-btn {
+      background: var(--accent);
+      color: var(--light-1);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      transition: background var(--transition);
+
+      &:hover {
+        background: var(--accent-hover);
+        color: var(--light-1);
+      }
+    }
+  }
+}
+
+/* ── Linux note ── */
+.linux-note {
+  background: var(--bg-surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+
+  & h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  & p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  & code {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--light-2);
+  }
+}
+
+/* ── Footer ── */
+.site-footer {
+  padding: 2rem 0;
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+
+  & a {
+    color: var(--text-muted);
+
+    &:hover {
+      color: var(--text);
+    }
+  }
+
+  & .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* ── Tablet ── */
+@media (min-width: 600px) {
+  .about .features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .downloads .download-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Desktop ── */
+@media (min-width: 900px) {
+  .hero {
+    padding: 4rem 0 3rem;
+  }
+
+  .about .features {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .downloads .download-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .container {
+    padding-inline: 2rem;
+  }
+}

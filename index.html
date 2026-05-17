@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flathub Arcade — Guess the App Icon</title>
+  <meta name="description" content="A retro pixel-art quiz game. Can you name GNOME apps from their icons? Available for macOS, Windows, and Linux.">
+  <meta name="theme-color" content="#1e1e1e">
+
+  <!-- Share cards -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Flathub Arcade">
+  <meta property="og:description" content="A retro pixel-art quiz game. Can you name GNOME apps from their icons?">
+  <meta property="og:image" content="https://flathub-arcade.jimmac.eu/hero-placeholder.png">
+  <meta property="og:url" content="https://flathub-arcade.jimmac.eu">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Flathub Arcade">
+  <meta name="twitter:description" content="A retro pixel-art quiz game. Can you name GNOME apps from their icons?">
+  <meta name="twitter:image" content="https://flathub-arcade.jimmac.eu/hero-placeholder.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">
+        <img src="flathub-logo.png" alt="">
+        Flathub Arcade
+      </a>
+      <nav>
+        <a href="#about">About</a>
+        <a href="#downloads">Downloads</a>
+        <a href="https://github.com/jimmac/flathub-arcade">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="container">
+        <div class="hero-image">
+          <img src="hero-placeholder.png" alt="Flathub Arcade running on an Anbernic RG CubeXX handheld console">
+        </div>
+        <h1>Flathub Arcade</h1>
+        <p class="tagline">Guess the app name from its icon.</p>
+        <a href="#downloads" class="cta">↓ Download</a>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="container">
+        <h2>What is this?</h2>
+        <p>A retro pixel-art quiz game featuring 166 GNOME app icons rendered as 32×32 sprites. Browse the collection, guess the app, then reveal the answer. Built with LÖVE and designed to run on everything from handhelds to desktops.</p>
+
+        <div class="features">
+          <div class="feature">
+            <div class="emoji">🎮</div>
+            <h3>Handheld Ready</h3>
+            <p>Runs natively on the Anbernic RG CubeXX via KNULLI and PortMaster.</p>
+          </div>
+          <div class="feature">
+            <div class="emoji">📺</div>
+            <h3>CRT Effects</h3>
+            <p>Authentic scanlines, barrel distortion, and glitch effects. Toggle with Tab.</p>
+          </div>
+          <div class="feature">
+            <div class="emoji">🖼️</div>
+            <h3>166 Icons</h3>
+            <p>Hand-crafted pixel art of GNOME and Flathub app icons at 32×32.</p>
+          </div>
+          <div class="feature">
+            <div class="emoji">⌨️</div>
+            <h3>Keyboard &amp; Gamepad</h3>
+            <p>Full support for keyboard, D-pad, and gamepad controls.</p>
+          </div>
+          <div class="feature">
+            <div class="emoji">🌙</div>
+            <h3>Screensaver Mode</h3>
+            <p>Idle for 30 seconds and a scrolling icon mosaic takes over with the Flathub logo.</p>
+          </div>
+          <div class="feature">
+            <div class="emoji">🔧</div>
+            <h3>Open Source</h3>
+            <p>MIT licensed. Built with LÖVE 11.5 and plain Lua.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="downloads" id="downloads">
+      <div class="container">
+        <h2>Downloads</h2>
+        <p class="subtitle">Grab the latest release for your platform.</p>
+        <span class="version-badge" id="version-badge">Loading…</span>
+
+        <div class="download-grid">
+          <div class="download-card">
+            <div class="platform-icon">🍎</div>
+            <div class="platform-info">
+              <h3>macOS</h3>
+              <p>Universal app bundle</p>
+            </div>
+            <a href="#" class="download-btn" id="dl-macos">Download</a>
+          </div>
+
+          <div class="download-card">
+            <div class="platform-icon">🪟</div>
+            <div class="platform-info">
+              <h3>Windows</h3>
+              <p>Portable .exe</p>
+            </div>
+            <a href="#" class="download-btn" id="dl-windows">Download</a>
+          </div>
+
+          <div class="download-card">
+            <div class="platform-icon">💾</div>
+            <div class="platform-info">
+              <h3>LÖVE Bundle</h3>
+              <p>.love file for any platform</p>
+            </div>
+            <a href="#" class="download-btn" id="dl-love">Download</a>
+          </div>
+        </div>
+
+        <div class="linux-note">
+          <h3>🐧 Linux</h3>
+          <p>Install the LÖVE runtime and run the .love bundle directly:</p>
+          <code>flatpak run org.love2d.love2d flathub-arcade.love</code>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/jimmac/flathub-arcade">GitHub</a>
+        <a href="https://jimmac.eu">jimmac.eu</a>
+        <a href="https://flathub.org">Flathub</a>
+      </div>
+      <p>Made with LÖVE by jimmac</p>
+    </div>
+  </footer>
+
+  <script>
+    // Fetch latest release from GitHub and update download links
+    (async () => {
+      const repo = "jimmac/flathub-arcade";
+      const badge = document.getElementById("version-badge");
+      const dlMacos = document.getElementById("dl-macos");
+      const dlWindows = document.getElementById("dl-windows");
+      const dlLove = document.getElementById("dl-love");
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+
+        badge.textContent = data.tag_name;
+
+        for (const asset of data.assets) {
+          const name = asset.name.toLowerCase();
+          if (name.includes("macos") || name.includes("mac") || name.endsWith(".app.zip")) {
+            dlMacos.href = asset.browser_download_url;
+          } else if (name.includes("win") || name.endsWith(".exe") || (name.includes("windows") && name.endsWith(".zip"))) {
+            dlWindows.href = asset.browser_download_url;
+          } else if (name.endsWith(".love")) {
+            dlLove.href = asset.browser_download_url;
+          }
+        }
+      } catch {
+        badge.textContent = "No release yet";
+      }
+    })();
+  </script>
+
+</body>
+</html>
