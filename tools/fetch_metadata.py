@@ -36,6 +36,7 @@ APP_IDS = {
     "calculator": "org.gnome.Calculator",
     "calendar": "org.gnome.Calendar",
     "calls": "org.gnome.Calls",
+    "calligraphy": "dev.geopjr.Calligraphy",
     "carburetor": "io.frama.tractor.carburetor",
     "cartridges": "page.kramo.Cartridges",
     "characters": "org.gnome.Characters",
