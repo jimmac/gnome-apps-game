@@ -41,7 +41,7 @@ function load_bfont(path, variant)
         g["0"]={1,31,4} g["1"]={6,31,2} g["2"]={9,31,4} g["3"]={14,31,4}
         g["4"]={19,31,4} g["5"]={24,31,4}
         g["6"]={1,37,4} g["7"]={6,37,4} g["8"]={11,37,4} g["9"]={16,37,4}
-        g[":"]={2,43,1} g["."]={4,43,1} g[","]={6,43,2}
+        g[":"]={2,43,1} g["."]={4,43,1} g[","]={6,43,2,7}
         g["/"]={10,43,1} g["!"]={12,43,1}
         g["<"]={14,43,4} g[">"]={19,43,3} g["?"]={23,43,3}
         g[" "]={0,0,3}   -- wider space for wide font
@@ -59,7 +59,7 @@ function load_bfont(path, variant)
         g["0"]={1,25,3} g["1"]={5,25,2} g["2"]={8,25,3} g["3"]={12,25,3}
         g["4"]={16,25,3} g["5"]={20,25,3} g["6"]={24,25,3}
         g["7"]={1,31,3} g["8"]={5,31,3} g["9"]={9,31,3}
-        g[":"]={2,37,1} g["."]={4,37,1} g[","]={6,37,2}
+        g[":"]={2,37,1} g["."]={4,37,1} g[","]={6,37,2,7}
         g["/"]={10,37,1} g["?"]={14,37,3}
         g["<"]={18,37,3} g[">"]={22,37,3}
         -- Button glyphs (narrow font only)
@@ -74,7 +74,8 @@ function load_bfont(path, variant)
     local iw, ih = f.image:getDimensions()
     for ch, d in pairs(g) do
         if ch ~= " " and not d.synthetic then
-            d.quad = love.graphics.newQuad(d[1], d[2], d[3], 5, iw, ih)
+            local gh = d[4] or 5  -- glyph height (default 5)
+            d.quad = love.graphics.newQuad(d[1], d[2], d[3], gh, iw, ih)
         end
     end
 
