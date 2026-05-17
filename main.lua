@@ -185,6 +185,7 @@ end
 -- canvases
 local vcanvas = nil    -- main 128×128 virtual screen
 local icon_canvas = nil -- 32×32 icon for shader effects
+local flathub_canvas = nil -- 128×128 for flathub overlay
 
 -- bitmap fonts
 local bfont = nil      -- narrow 5px bitmap font (descriptions)
@@ -228,6 +229,9 @@ local meta = {}  -- appstream metadata
 local logo_top = nil
 local logo_bot = nil
 
+-- flathub overlay
+local flathub_image = nil
+
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     love.graphics.setBackgroundColor(0, 0, 0)
@@ -239,6 +243,14 @@ function love.load()
     -- icon canvas (32×32 for shader effects)
     icon_canvas = love.graphics.newCanvas(32, 32)
     icon_canvas:setFilter("nearest", "nearest")
+
+    -- flathub overlay canvas (128×128)
+    flathub_canvas = love.graphics.newCanvas(VW, VH)
+    flathub_canvas:setFilter("nearest", "nearest")
+
+    -- load flathub image
+    flathub_image = love.graphics.newImage("assets/flathub.png")
+    flathub_image:setFilter("nearest", "nearest")
 
     -- load sounds
     sfx_swoosh = love.audio.newSource("assets/sfx/swoosh.wav", "static")
@@ -942,6 +954,8 @@ local SS_GRID = 20         -- icon cell size (16px icon + 4px gap)
 local SS_ICON_SCALE = 0.5  -- draw icons at 50%
 local SS_SPEED_X = -3      -- pixels/sec horizontal drift (negative = left)
 local SS_SPEED_Y = 10      -- pixels/sec vertical scroll
+local SS_FLATHUB_DELAY = 20 -- seconds before flathub overlay appears
+local SS_FLATHUB_FADE = 2   -- seconds to fade in
 
 function states.screensaver:enter()
     self.t = 0
@@ -962,6 +976,14 @@ function states.screensaver:enter()
     -- grid: enough columns/rows to tile with wrapping
     self.cols = math.ceil(VW / SS_GRID) + 2
     self.rows = math.ceil(VH / SS_GRID) + 2
+
+    -- flathub overlay
+    self.flathub_alpha = 0
+    self.flathub_glitch = {
+        active = false, timer = 0, duration = 0,
+        next_trigger = SS_FLATHUB_DELAY + 2 + math.random() * 5,
+        elapsed = 0,
+    }
 end
 
 function states.screensaver:update(dt)
@@ -969,6 +991,28 @@ function states.screensaver:update(dt)
     self.fade_in = math.min(self.t / 1.5, 1)
     self.scroll_x = self.scroll_x + SS_SPEED_X * dt
     self.scroll_y = self.scroll_y + SS_SPEED_Y * dt
+
+    -- flathub overlay fade-in after delay
+    if self.t > SS_FLATHUB_DELAY then
+        self.flathub_alpha = math.min((self.t - SS_FLATHUB_DELAY) / SS_FLATHUB_FADE, 1)
+    end
+
+    -- flathub ambient glitch (same timing as icon glitch)
+    local fg = self.flathub_glitch
+    fg.elapsed = fg.elapsed + dt
+    if fg.active then
+        fg.timer = fg.timer - dt
+        if fg.timer <= 0 then
+            fg.active = false
+            fg.next_trigger = fg.elapsed + 3 + math.random() * 7
+        end
+    else
+        if fg.elapsed >= fg.next_trigger and self.flathub_alpha > 0 then
+            fg.active = true
+            fg.duration = 0.4 + math.random() * 0.6
+            fg.timer = fg.duration
+        end
+    end
 end
 
 function states.screensaver:draw()
@@ -998,6 +1042,30 @@ function states.screensaver:draw()
                 love.graphics.setColor(1, 1, 1, alpha)
                 love.graphics.draw(icon.image, math.floor(x), math.floor(y), 0, SS_ICON_SCALE, SS_ICON_SCALE)
             end
+        end
+    end
+
+    -- flathub overlay (composited on top with glitch)
+    if self.flathub_alpha > 0 and flathub_image then
+        -- draw flathub to its own canvas for shader processing
+        love.graphics.setCanvas(flathub_canvas)
+        love.graphics.clear(0, 0, 0, 0)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.draw(flathub_image, 0, 0)
+        love.graphics.setCanvas(vcanvas)
+
+        -- draw with glitch shader if active
+        local fg = self.flathub_glitch
+        love.graphics.setColor(1, 1, 1, self.flathub_alpha)
+        if fg.active and glitch_shader then
+            local intensity = math.min(fg.timer / fg.duration, 1)
+            glitch_shader:send("time", love.timer.getTime())
+            glitch_shader:send("intensity", intensity)
+            love.graphics.setShader(glitch_shader)
+            love.graphics.draw(flathub_canvas, 0, 0)
+            love.graphics.setShader()
+        else
+            love.graphics.draw(flathub_canvas, 0, 0)
         end
     end
 end
