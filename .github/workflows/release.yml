@@ -1,0 +1,118 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+env:
+  GAME_NAME: flathub-arcade
+  LOVE_VERSION: 11.5
+
+jobs:
+  build-love:
+    name: Build .love bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build .love file
+        uses: love-actions/love-actions-core@v1
+        with:
+          build-list: "./assets/ ./conf.lua ./main.lua"
+          package-path: ${{ env.GAME_NAME }}.love
+
+      - name: Upload .love artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: love-bundle
+          path: ${{ env.GAME_NAME }}.love
+
+  build-macos:
+    name: Build macOS app
+    needs: build-love
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download .love bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: love-bundle
+
+      - name: Build macOS portable
+        uses: love-actions/love-actions-macos-portable@v1
+        with:
+          love-version: ${{ env.LOVE_VERSION }}
+          app-name: "Flathub Arcade"
+          bundle-id: "eu.jimmac.FlathubArcade"
+          icon-path: ./assets/flathub.png
+          love-package: ${{ env.GAME_NAME }}.love
+          product-name: "Flathub Arcade"
+          output-folder: build-macos
+
+      - name: Zip macOS app
+        run: |
+          cd build-macos
+          zip -r -y ../${{ env.GAME_NAME }}-macos.zip "Flathub Arcade.app"
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: ${{ env.GAME_NAME }}-macos.zip
+
+  build-windows:
+    name: Build Windows exe
+    needs: build-love
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download .love bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: love-bundle
+
+      - name: Build Windows package
+        uses: love-actions/love-actions-windows@v1
+        with:
+          love-version: ${{ env.LOVE_VERSION }}
+          icon-path: ./assets/flathub.png
+          love-package: ${{ env.GAME_NAME }}.love
+          product-name: "Flathub Arcade"
+          output-folder: build-windows
+
+      - name: Zip Windows build
+        shell: bash
+        run: |
+          cd build-windows
+          7z a ../${{ env.GAME_NAME }}-windows.zip .
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: ${{ env.GAME_NAME }}-windows.zip
+
+  release:
+    name: Create GitHub Release
+    needs: [build-love, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            artifacts/love-bundle/${{ env.GAME_NAME }}.love
+            artifacts/macos-build/${{ env.GAME_NAME }}-macos.zip
+            artifacts/windows-build/${{ env.GAME_NAME }}-windows.zip
