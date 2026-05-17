@@ -210,7 +210,7 @@ local prev_state_name = nil  -- for returning from screensaver
 
 -- idle tracking
 local idle_timer = 0
-local IDLE_TIMEOUT = 60  -- seconds before screensaver
+local IDLE_TIMEOUT = 30  -- seconds before screensaver
 
 function set_state(name, ...)
     current_state = states[name]
@@ -938,7 +938,8 @@ end
 ------------------------------------------------------------
 states.screensaver = {}
 
-local SS_GRID = 36         -- icon cell size (32px icon + 4px gap)
+local SS_GRID = 20         -- icon cell size (16px icon + 4px gap)
+local SS_ICON_SCALE = 0.5  -- draw icons at 50%
 local SS_SPEED_X = -3      -- pixels/sec horizontal drift (negative = left)
 local SS_SPEED_Y = 10      -- pixels/sec vertical scroll
 
@@ -995,7 +996,7 @@ function states.screensaver:draw()
                 local x = c * SS_GRID - ox
                 local y = r * SS_GRID - oy
                 love.graphics.setColor(1, 1, 1, alpha)
-                love.graphics.draw(icon.image, math.floor(x), math.floor(y))
+                love.graphics.draw(icon.image, math.floor(x), math.floor(y), 0, SS_ICON_SCALE, SS_ICON_SCALE)
             end
         end
     end
