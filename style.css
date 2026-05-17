@@ -272,11 +272,6 @@ a {
     border-radius: var(--radius);
     border: 1px solid rgba(255, 255, 255, 0.06);
 
-    & .emoji {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
     & h3 {
       font-size: 1rem;
       font-weight: 600;
@@ -336,13 +331,6 @@ a {
     &:hover {
       border-color: rgba(255, 255, 255, 0.12);
       transform: translateY(-1px);
-    }
-
-    & .platform-icon {
-      font-size: 1.75rem;
-      flex-shrink: 0;
-      width: 2.5rem;
-      text-align: center;
     }
 
     & .platform-info {
