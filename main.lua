@@ -649,6 +649,11 @@ function states.game:enter()
     -- transition (icon change glitch)
     self.trans = {active = false, timer = 0, duration = 0.5, seed = 0}
 
+    -- counter fade (shows on app change, then fades out)
+    self.counter_alpha = 1
+    self.counter_fade_delay = 1.5  -- seconds to stay visible
+    self.counter_fade_duration = 0.5  -- seconds to fade out
+
     -- ambient glitch
     self.glitch = {
         active = false, timer = 0, duration = 0,
@@ -760,6 +765,15 @@ function states.game:update(dt)
         r.timer = r.timer + dt
         r.desc_alpha = math.min(r.timer / 0.4, 1)  -- fade in over 0.4s
     end
+
+    -- counter fade-out
+    if self.counter_alpha > 0 then
+        if self.counter_fade_delay > 0 then
+            self.counter_fade_delay = self.counter_fade_delay - dt
+        else
+            self.counter_alpha = math.max(0, self.counter_alpha - dt / self.counter_fade_duration)
+        end
+    end
 end
 
 function states.game:go(dir)
@@ -779,6 +793,9 @@ function states.game:go(dir)
     self.reveal.chars_shown = 0
     self.reveal.desc_alpha = 0
     sfx_type:stop()
+    -- reset counter fade
+    self.counter_alpha = 1
+    self.counter_fade_delay = 1.5
 end
 
 function states.game:jump_random()
@@ -794,6 +811,9 @@ function states.game:jump_random()
     self.reveal.chars_shown = 0
     sfx_type:stop()
     self.reveal.desc_alpha = 0
+    -- reset counter fade
+    self.counter_alpha = 1
+    self.counter_fade_delay = 1.5
 end
 
 function states.game:start_reveal()
@@ -885,9 +905,11 @@ function states.game:draw()
         love.graphics.draw(icon_canvas, ICON_X, icon_y)
     end
 
-    -- counter (always at top)
-    love.graphics.setColor(C.dim)
-    bfont_printf(bfont, self.index .. "/" .. icon_count, 0, VH - 8, VW, "center")
+    -- counter (fades out after app change)
+    if self.counter_alpha > 0 then
+        love.graphics.setColor(C.dim[1], C.dim[2], C.dim[3], self.counter_alpha)
+        bfont_printf(bfont, self.index .. "/" .. icon_count, 0, VH - 8, VW, "center")
+    end
 
     -- reveal text
     if r.phase >= PHASE_TYPE then
