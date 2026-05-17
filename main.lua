@@ -233,6 +233,7 @@ local logo_bot = nil
 local flathub_image = nil
 
 function love.load()
+    math.randomseed(os.time())
     love.graphics.setDefaultFilter("nearest", "nearest")
     love.graphics.setBackgroundColor(0, 0, 0)
 
