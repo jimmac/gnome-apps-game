@@ -115,7 +115,7 @@ APP_IDS = {
     "loupe": "org.gnome.Loupe",
     "lorem": "org.gnome.design.Lorem",
     "maps": "org.gnome.Maps",
-    "markets": None,
+    "vocalis": None,
     "mesero": None,
     "metadata-cleaner": "io.gitlab.metadatacleaner.metadatacleaner",
     "metronome": "com.adrienplazas.Metronome",

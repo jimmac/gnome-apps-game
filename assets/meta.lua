@@ -146,7 +146,7 @@ return {
   highscore = { name="Highscore", author="Alexander Mikhaylenko", desc="Retro gaming with libretro"},
   letterpress = { name="Letterpress", author="GNOME", desc="Create beautiful ASCII text art"},
   lipi = { name="Lipi", author="GNOME", desc="Install fonts"},
-  markets = { name="Markets", author="GNOME", desc="Track stock and crypto prices"},
+  vocalis = { name="Vocalis", author="Christopher Davis", desc="Predecessor to Sound Recorder"},
   mesero = { name="Mesero", author="GNOME", desc="Wacom tablet configuration"},
   mixtape = { name="Mixtape", author="GNOME", desc="Create and share playlists"},
   ["mutter-viewer"] = { name="Mutter Viewer", author="GNOME", desc="Debug the GNOME compositor"},
