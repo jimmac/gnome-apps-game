@@ -152,7 +152,7 @@ return {
   ["paper-clip"] = { name="Paper Clip", author="GNOME", desc="Edit PDF metadata" },
   plots = { name="Plots", author="GNOME", desc="Plot mathematical functions" },
   quertone = { name="Quertone", author="GNOME", desc="Play tones with your keyboard" },
-  reflection = { name="Reflection", author="GNOME", desc="A personal journal" },
+  reflection = { name="Reflection", author="Modal Collective", desc="A collaborative text editor. Built with p2panda local-first peer to peer protocol." },
   rissole = { name="Rissole", author="GNOME", desc="A recipe manager" },
   rotor = { name="Rotor", author="GNOME", desc="Encode and decode text ciphers" },
   screenshot = { name="Screenshot", author="GNOME", desc="Capture the screen" },
