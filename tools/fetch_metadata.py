@@ -112,6 +112,7 @@ APP_IDS = {
     "letters": "net.codelogistics.letters",
     "lipi": None,
     "logs": "org.gnome.Logs",
+    "loupe": "org.gnome.Loupe",
     "lorem": "org.gnome.design.Lorem",
     "maps": "org.gnome.Maps",
     "markets": None,

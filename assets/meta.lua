@@ -81,6 +81,7 @@ return {
   laser = { name="Laser", author="Andreas Knoben", desc="Rip CDs with ease", flatpak="nl.andreasknoben.Laser"},
   letters = { name="Letters", author="Satvik Patwardhan", desc="Word processor for GNOME", flatpak="net.codelogistics.letters"},
   logs = { name="Logs", author="The GNOME Project", desc="View detailed event logs for the system", flatpak="org.gnome.Logs"},
+  loupe = { name="Image Viewer", author="The GNOME Project", desc="View and edit images", flatpak="org.gnome.Loupe"},
   lorem = { name="Lorem", author="Maximiliano Sandoval", desc="Generate placeholder text", flatpak="org.gnome.design.Lorem"},
   maps = { name="Maps", author="The GNOME Project", desc="Find places around the world", flatpak="org.gnome.Maps"},
   ["metadata-cleaner"] = { name="Metadata Cleaner", author="Metadata Cleaner Developers", desc="View and clean metadata in files", flatpak="io.gitlab.metadatacleaner.metadatacleaner"},
