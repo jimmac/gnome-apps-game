@@ -28,7 +28,7 @@ return {
   clocks = { name="Clocks", author="The GNOME Project", desc="Keep track of time", flatpak="org.gnome.clocks"},
   collision = { name="Collision", author="Evangelos \"GeopJr\" Paterakis", desc="Check hashes for your files", flatpak="dev.geopjr.Collision"},
   colorcode = { name="Color Code", author="oyajun", desc="Color Code to Resistance Value", flatpak="com.oyajun.ColorCode"},
-  colorway = { name="Colorway", author="Lains", desc="Generate color pairings", flatpak="io.github.lainsce.Colorway"},
+  moviola = { name="Moviola", author="Fareed Hussain", desc="Video editor"},
   commit = { name="Commit", author="Sonny Piers", desc="Commit message editor", flatpak="re.sonny.Commit"},
   connections = { name="Connections", author="The GNOME Project", desc="View and use other desktops", flatpak="org.gnome.Connections"},
   contacts = { name="Contacts", author="The GNOME Project", desc="Manage your contacts", flatpak="org.gnome.Contacts"},

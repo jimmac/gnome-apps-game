@@ -48,7 +48,7 @@ APP_IDS = {
     "collision": "dev.geopjr.Collision",
     "color-manager": None,
     "colorcode": "com.oyajun.ColorCode",
-    "colorway": "io.github.lainsce.Colorway",
+    "moviola": None,
     "commit": "re.sonny.Commit",
     "connections": "org.gnome.Connections",
     "contacts": "org.gnome.Contacts",
