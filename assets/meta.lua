@@ -92,7 +92,7 @@ return {
   obfuscate = { name="Obfuscate", author="Bilal Elmoussaoui", desc="Censor private information" },
   papers = { name="Document Viewer", author="The GNOME Project", desc="Read documents" },
   photos = { name="Photos", author="The GNOME Project", desc="Access, organize and share your photos on GNOME" },
-  piccolo = { name="Piccolo", author="FatDawlf", desc="Color picking with style" },
+  piccolo = { name="Piccolo", author="Pixelo789", desc="Lightweight music player" },
   ["pika-backup"] = { name="Pika Backup", author="Small Mammal Collective", desc="Keep your data safe" },
   podcasts = { name="Podcasts", author="The Podcasts developers", desc="Listen to your favorite shows" },
   polari = { name="Polari", author="Florian Mullner", desc="Talk to people on IRC" },
