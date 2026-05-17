@@ -995,7 +995,7 @@ local SS_GRID = 20         -- icon cell size (16px icon + 4px gap)
 local SS_ICON_SCALE = 0.5  -- draw icons at 50%
 local SS_SPEED_X = -3      -- pixels/sec horizontal drift (negative = left)
 local SS_SPEED_Y = 10      -- pixels/sec vertical scroll
-local SS_FLATHUB_DELAY = 20 -- seconds before flathub overlay appears
+local SS_FLATHUB_DELAY = 5  -- seconds before flathub overlay appears
 local SS_FLATHUB_FADE = 2   -- seconds to fade in
 
 function states.screensaver:enter()
