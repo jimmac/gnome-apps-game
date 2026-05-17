@@ -1,5 +1,5 @@
 function love.conf(t)
-    t.title = "GNOME Apps"
+    t.title = "Flathub Arcade"
     t.version = "11.5"
     t.window.width = 720
     t.window.height = 720

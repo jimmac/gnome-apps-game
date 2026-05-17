@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=GNOME Icons
-Comment=Retro icon quiz screensaver for GNOME apps
+Name=Flathub Arcade
+Comment=Retro icon quiz screensaver for Flathub apps
 Exec=flatpak run --filesystem=/var/work/src/git/retro-consoles/love2d/icons:ro org.love2d.love2d /var/work/src/git/retro-consoles/love2d/icons
 Icon=application-x-love-game
 Categories=Game;

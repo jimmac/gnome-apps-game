@@ -1,4 +1,4 @@
--- GNOME Apps Icon Quiz
+-- Flathub Arcade
 -- (CC BY-SA 4.0) jimmac.eu
 
 -- Virtual resolution & scaling

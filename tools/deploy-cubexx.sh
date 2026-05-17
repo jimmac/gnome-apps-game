@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy GNOME Icons quiz to Anbernic RG CubeXX via PortMaster (LÖVE 11.5)
+# Deploy Flathub Arcade to Anbernic RG CubeXX via PortMaster (LÖVE 11.5)
 #
 # Packages the game into a .love bundle and deploys it either to a mounted
 # SD card or over the network via KNULLI's Samba share.
@@ -14,10 +14,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-GAME_ID="gnome-icons"
+GAME_ID="flathub-arcade"
 LOVE_FILE="$GAME_ID.love"
 PORTS_DIR="ports"
-LAUNCHER="GNOME Icons.sh"
+LAUNCHER="Flathub Arcade.sh"
+OLD_GAME_ID="gnome-icons"
+OLD_LAUNCHER="GNOME Icons.sh"
 
 # KNULLI network share
 SMB_HOST="knulli.local"
@@ -38,7 +40,7 @@ usage() {
     cat <<EOF
 Usage: $(basename "$0") [options] [mountpoint]
 
-Package and deploy the GNOME Icons quiz to an Anbernic RG CubeXX SD card.
+Package and deploy Flathub Arcade to an Anbernic RG CubeXX SD card.
 
 Options:
   --package-only    Build the .love file without deploying
@@ -124,11 +126,15 @@ deploy_smbclient() {
 
     info "Deploying via smbclient to $smb_url..."
 
-    # Build smbclient batch commands
+    # Build smbclient batch commands — remove old game first
     local batch
     batch=$(mktemp)
     cat > "$batch" <<SMBBATCH
-mkdir roms\\ports\\$GAME_ID
+cd roms\\ports
+del $OLD_GAME_ID\\*
+rmdir $OLD_GAME_ID
+del "$OLD_LAUNCHER"
+mkdir $GAME_ID
 cd roms\\ports\\$GAME_ID
 lcd $PROJECT_DIR
 put $LOVE_FILE
@@ -249,6 +255,15 @@ deploy_local() {
     fi
 
     info "Deploying to $mountpoint..."
+
+    # Remove old game if present
+    local old_game_path="$ports_path/$OLD_GAME_ID"
+    local old_launcher_path="$ports_path/$OLD_LAUNCHER"
+    if [ -d "$old_game_path" ] || [ -f "$old_launcher_path" ]; then
+        info "Removing old game ($OLD_GAME_ID)..."
+        rm -rf "$old_game_path"
+        rm -f "$old_launcher_path"
+    fi
 
     # Create directory structure
     mkdir -p "$game_path"
