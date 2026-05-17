@@ -163,7 +163,7 @@ APP_IDS = {
     "system-monitor": "org.gnome.SystemMonitor",
     "tabs": None,
     "tangram": "re.sonny.Tangram",
-    "teddybear": None,
+    "simba": None,
     "ptyxis": "app.devsuite.Ptyxis",
     "terminal": None,
     "text-editor": "org.gnome.TextEditor",
