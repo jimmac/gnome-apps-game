@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Flathub Arcade
-Comment=Retro icon quiz screensaver for Flathub apps
+Comment=Guess the app name from its icon.
 Exec=flatpak run --filesystem=/var/work/src/git/retro-consoles/love2d/flathub-arcade:ro org.love2d.love2d /var/work/src/git/retro-consoles/love2d/flathub-arcade
 Icon=application-x-love-game
 Categories=Game;

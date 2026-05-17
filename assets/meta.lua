@@ -13,7 +13,6 @@ return {
   blanket = { name="Blanket", author="Rafael Mardojai CM", desc="Listen to ambient sounds in this polished white noise machine on steroids.", flatpak="com.rafaelmardojai.Blanket"},
   boatswain = { name="Boatswain", author="Georges Basile Stavracas Neto", desc="Control your Elgato Stream Deck", flatpak="com.feaneron.Boatswain"},
   boxes = { name="Boxes", author="The GNOME Project", desc="Virtualization made simple", flatpak="org.gnome.Boxes"},
-  impression = { name="Impression", author="Khaleel Al-Adhami", desc="Create bootable drives", flatpak="io.gitlab.adhami3310.Impression"},
   brief = { name="Brief", author="Shone Binu", desc="Browse command-line cheatsheets", flatpak="io.github.shonebinu.Brief"},
   builder = { name="Builder", author="Christian Hergert", desc="Create applications for GNOME in a polished IDE", flatpak="org.gnome.Builder"},
   calculator = { name="Calculator", author="The GNOME Project", desc="Perform arithmetic, scientific or financial calculations", flatpak="org.gnome.Calculator"},

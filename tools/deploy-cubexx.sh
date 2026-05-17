@@ -224,6 +224,57 @@ find_target() {
     return 1
 }
 
+# Update or insert gamelist.xml entry for EmulationStation
+update_gamelist() {
+    local ports_path="$1"
+    local gamelist="$ports_path/gamelist.xml"
+
+    python3 - "$gamelist" <<'PYEOF'
+import xml.etree.ElementTree as ET
+import os, sys
+
+path = sys.argv[1]
+entry_path = "./Flathub Arcade.sh"
+
+meta = {
+    "name": "Flathub Arcade",
+    "desc": "Guess the app name from its icon.",
+    "image": "./flathub-arcade/cover.png",
+    "developer": "jimmac.eu",
+    "genre": "Quiz",
+}
+
+if os.path.exists(path):
+    tree = ET.parse(path)
+    root = tree.getroot()
+else:
+    root = ET.Element("gameList")
+    tree = ET.ElementTree(root)
+
+# Find or create entry
+game = None
+for g in root.findall("game"):
+    p = g.find("path")
+    if p is not None and p.text == entry_path:
+        game = g
+        break
+
+if game is None:
+    game = ET.SubElement(root, "game")
+    ET.SubElement(game, "path").text = entry_path
+
+# Update fields (preserve playcount, lastplayed, gametime)
+for key, val in meta.items():
+    el = game.find(key)
+    if el is None:
+        el = ET.SubElement(game, key)
+    el.text = val
+
+ET.indent(tree, space="\t")
+tree.write(path, encoding="unicode", xml_declaration=True)
+PYEOF
+}
+
 # Find the roms directory (case-insensitive)
 find_roms_dir() {
     local mount="$1"
@@ -282,6 +333,10 @@ deploy_local() {
         cp "$PROJECT_DIR/cover.png" "$game_path/cover.png"
         info "Copied cover.png → $game_path/"
     fi
+
+    # Update gamelist.xml for EmulationStation
+    update_gamelist "$ports_path"
+    info "Updated gamelist.xml"
 
     # Sync to ensure writes are flushed
     sync 2>/dev/null || true
