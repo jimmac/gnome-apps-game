@@ -629,7 +629,7 @@ local PHASE_TYPE = 2     -- typewriter name + author
 local PHASE_DESC = 3     -- description fades in
 
 function states.game:enter()
-    self.index = 1
+    self.index = math.random(1, math.max(1, icon_count))
     self.input_delay = 0
     self.repeat_rate = 0.15
 
