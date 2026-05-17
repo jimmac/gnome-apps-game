@@ -9,8 +9,9 @@ A retro quiz game — can you name all 166 GNOME apps from their icons?
 - **D-pad / Arrow keys** — browse icons
 - **A / X / Enter** — reveal the app name
 - **B / Z / Space** — jump to a random icon
+- **SE / Tab** — toggle CRT effect
 
-Icons are displayed one at a time on a virtual 128×128 pixel canvas scaled up to 720×720 with a full 80s CRT effect — scanlines, phosphor glow, RGB subpixels, vignette, and barrel distortion. Channel-switch glitches fire on navigation and random ambient VHS artifacts keep things interesting.
+Browse app icons one by one or hit (A) for a random app. (B) reveals the app name and author. Treat it like a card memory game or simply enjoy some nice pixelart or an inspiration to take a peek at flathub.org.
 
 ## Framework
 
@@ -18,7 +19,7 @@ Built with [LÖVE 2D](https://love2d.org/) (11.5) — a Lua game framework. The 
 
 ### Icons
 
-32×32 RGBA PNGs of GNOME application icons, rendered from the [GNOME HIG](https://developer.gnome.org/hig/) icon set. Licensed under CC BY-SA 4.0.
+32×32 RGBA PNGs of GNOME application icons, rendered from the [GNOME HIG](https://developer.gnome.org/hig/) icon set. Licensed under CC BY-SA 4.0. Read about [why they exist](https://blog.jimmac.eu/posts/app-pixels/). See more pixelart at [art.jimmac.eu](https://art.jimmac.eu)
 
 ## Running
 
@@ -44,24 +45,8 @@ The game runs on ARM handhelds via PortMaster's LÖVE 11.5 runtime.
 2. Copy `GNOME Icons.sh` to `roms/ports/`
 3. Refresh gamelists in EmulationStation
 
-### Replacing Sound Effects
-
-The placeholder WAVs in `assets/sfx/` can be replaced with custom [sfxr](https://sfxr.me/) sounds:
-
-| File | Trigger | Volume |
-|------|---------|--------|
-| `swoosh.wav` | Icon navigation | 50% |
-| `glitch.wav` | Random ambient glitch | 15% |
-| `reveal.wav` | Name reveal | 40% |
-
-## Plans
-* [ ] Create a custom font
-* [ ] Sidecar metadata. Present author and description from flathub/appstream.
-
 
 ## License
 
 Code: [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html)  
 Icons: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 
-
-*jimmac.eu*
