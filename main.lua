@@ -389,6 +389,7 @@ function load_icons()
                 name = m and m.name or key:gsub("[-_.]", " "),
                 author = m and m.author or "",
                 desc = m and m.desc or "",
+                flatpak = m and m.flatpak or nil,
             }
             table.insert(icons, entry)
         end
@@ -852,6 +853,10 @@ function states.game:start_reveal()
         r.desc_lines = bfont_wrap(bfont, icon.desc, TEXT_WIDTH)
     else
         r.desc_lines = {}
+    end
+    if not icon.flatpak then
+        table.insert(r.desc_lines, "")
+        table.insert(r.desc_lines, "Not on Flathub (yet)")
     end
     -- calculate target icon Y based on content height
     local name_h = #r.name_lines * LINE_H

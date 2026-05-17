@@ -20,7 +20,7 @@ APP_IDS = {
     "alpaca": "com.jeffser.Alpaca",
     "amberol": "io.bassi.Amberol",
     "apostrophe": "org.gnome.gitlab.somas.Apostrophe",
-    "aria": "com.poppingmoon.aria",
+    "aria": None,
     "atomix": "org.gnome.atomix",
     "audio-sharing": "de.haeckerfelix.AudioSharing",
     "authenticator": "com.belmoussaoui.Authenticator",
@@ -30,7 +30,7 @@ APP_IDS = {
     "blanket": "com.rafaelmardojai.Blanket",
     "boatswain": "com.feaneron.Boatswain",
     "boxes": "org.gnome.Boxes",
-    "brasero": "org.gnome.Brasero",
+    "impression": "io.gitlab.adhami3310.Impression",
     "brief": "io.github.shonebinu.Brief",
     "builder": "org.gnome.Builder",
     "calculator": "org.gnome.Calculator",
@@ -53,7 +53,8 @@ APP_IDS = {
     "contacts": "org.gnome.Contacts",
     "cozy": "com.github.geigi.cozy",
     "curtail": "com.github.huluti.Curtail",
-    "decibels": "org.gnome.Decibels",
+    "audio-player": "org.gnome.Decibels",
+    "decibels": None,
     "decoder": "com.belmoussaoui.Decoder",
     "deer": None,
     "dejadup-backups": "org.gnome.DejaDup",
@@ -61,7 +62,7 @@ APP_IDS = {
     "dialect": "app.drey.Dialect",
     "disk-analyzer": "org.gnome.baobab",
     "disks": "org.gnome.DiskUtility",
-    "drawing": "com.github.maoschanz.drawing",
+    "railway": "de.schmidhuberj.DieBahn",
     "drum-machine": "io.github.revisto.drum-machine",
     "dspy": "org.gnome.dspy",
     "ear-tag": "app.drey.EarTag",
@@ -126,7 +127,7 @@ APP_IDS = {
     "nucleus": "page.codeberg.lo_vely.Nucleus",
     "obfuscate": "com.belmoussaoui.Obfuscate",
     "os-install": None,
-    "paper-clip": None,
+    "paper-clip": "io.github.diegoivan.pdf_metadata_editor",
     "papers": "org.gnome.Papers",
     "photos": "org.gnome.Photos",
     "piccolo": "art.fatdawlf.Piccolo",
@@ -135,7 +136,7 @@ APP_IDS = {
     "podcasts": "org.gnome.Podcasts",
     "polari": "org.gnome.Polari",
     "poliedros": "io.github.kriptolix.Poliedros",
-    "quertone": None,
+    "qwertone": "com.gitlab.azymohliad.Qwertone",
     "reflection": None,
     "resources": "net.nokyan.Resources",
     "reversi": "org.gnome.Reversi",
@@ -157,13 +158,14 @@ APP_IDS = {
     "sound-recorder": "org.gnome.SoundRecorder",
     "ssh-pilot": "io.github.mfat.sshpilot",
     "stereotype": None,
-    "stickynotes": None,
+    "keypunch": "dev.bragefuglseth.Keypunch",
     "sudoku": "org.gnome.Sudoku",
     "system-monitor": "org.gnome.SystemMonitor",
     "tabs": None,
     "tangram": "re.sonny.Tangram",
     "teddybear": None,
-    "terminal": "org.gnome.Terminal",
+    "ptyxis": "app.devsuite.Ptyxis",
+    "terminal": None,
     "text-editor": "org.gnome.TextEditor",
     "text-pieces": "io.gitlab.liferooter.TextPieces",
     "tour": None,
@@ -277,6 +279,7 @@ def main():
             "name": name,
             "author": author,
             "desc": short_desc,
+            "flatpak": app_id,
         }
         print(f"OK - {name} by {author}")
         time.sleep(0.1)
@@ -292,7 +295,8 @@ def main():
             author = lua_escape(m["author"])
             desc = lua_escape(m["desc"])
             key = f'["{icon}"]' if "-" in icon else icon
-            f.write(f'  {key} = {{ name="{name}", author="{author}", desc="{desc}" }},\n')
+            flatpak = lua_escape(m["flatpak"])
+            f.write(f'  {key} = {{ name="{name}", author="{author}", desc="{desc}", flatpak="{flatpak}" }},\n')
 
         # Add skipped/missed entries as stubs for manual filling
         f.write("\n  -- Manual entries (no Flathub data)\n")
