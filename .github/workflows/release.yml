@@ -92,7 +92,7 @@ jobs:
   build-windows:
     name: Build Windows exe
     needs: build-love
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -101,26 +101,23 @@ jobs:
         with:
           name: love-bundle
 
-      - name: Generate Windows .ico icon
-        shell: bash
+      - name: Build Windows packages
         run: |
-          choco install imagemagick -y --no-progress
-          magick ./assets/flathub.png -define icon:auto-resize=256,128,64,48,32,16 ./assets/flathub.ico
+          # Download LÖVE Windows builds
+          curl -L -o love-win64.zip https://github.com/love2d/love/releases/download/${{ env.LOVE_VERSION }}/love-${{ env.LOVE_VERSION }}-win64.zip
+          unzip -q love-win64.zip
+          mv love-${{ env.LOVE_VERSION }}-win64 win64
 
-      - name: Build Windows package
-        uses: love-actions/love-actions-windows@v1
-        with:
-          love-version: ${{ env.LOVE_VERSION }}
-          icon-path: ./assets/flathub.ico
-          love-package: ${{ env.GAME_NAME }}.love
-          product-name: "Flathub Arcade"
-          output-folder: build-windows
+          # Fuse .love into exe (concatenate love.exe + game.love)
+          cat win64/love.exe ${{ env.GAME_NAME }}.love > win64/FlathubArcade.exe
+          rm win64/love.exe win64/lovec.exe
 
-      - name: Zip Windows build
-        shell: bash
-        run: |
-          cd build-windows
-          7z a ../${{ env.GAME_NAME }}-windows.zip .
+          # Clean up unnecessary files
+          rm -f win64/changes.txt win64/readme.txt win64/game.ico win64/love.ico
+
+          # Zip it up
+          cd win64
+          zip -r ../${{ env.GAME_NAME }}-windows.zip .
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
