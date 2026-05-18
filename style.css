@@ -97,12 +97,6 @@ a {
     font-weight: 700;
     font-size: 1.1rem;
     color: var(--text);
-
-    & img {
-      width: 28px;
-      height: 28px;
-      image-rendering: pixelated;
-    }
   }
 
   & nav {
