@@ -131,12 +131,11 @@ a {
     max-width: 100%;
     border-radius: var(--radius);
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
     & img {
       width: 100%;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
+      height: auto;
+      object-fit: contain;
     }
   }
 
