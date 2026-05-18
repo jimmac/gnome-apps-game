@@ -44,13 +44,26 @@ jobs:
         with:
           name: love-bundle
 
+      - name: Generate macOS .icns icon
+        run: |
+          # Create iconset directory with all required sizes
+          mkdir -p icon.iconset
+          for size in 16 32 128 256 512; do
+            sips -z $size $size ./assets/flathub.png --out icon.iconset/icon_${size}x${size}.png
+            double=$((size * 2))
+            if [ $double -le 1024 ]; then
+              sips -z $double $double ./assets/flathub.png --out icon.iconset/icon_${size}x${size}@2x.png
+            fi
+          done
+          iconutil -c icns icon.iconset -o ./assets/flathub.icns
+
       - name: Build macOS portable
         uses: love-actions/love-actions-macos-portable@v1
         with:
           love-version: ${{ env.LOVE_VERSION }}
           app-name: "Flathub Arcade"
           bundle-id: "eu.jimmac.FlathubArcade"
-          icon-path: ./assets/flathub.png
+          icon-path: ./assets/flathub.icns
           love-package: ${{ env.GAME_NAME }}.love
           product-name: "Flathub Arcade"
           output-folder: build-macos
@@ -78,11 +91,17 @@ jobs:
         with:
           name: love-bundle
 
+      - name: Generate Windows .ico icon
+        shell: bash
+        run: |
+          choco install imagemagick -y --no-progress
+          magick ./assets/flathub.png -define icon:auto-resize=256,128,64,48,32,16 ./assets/flathub.ico
+
       - name: Build Windows package
         uses: love-actions/love-actions-windows@v1
         with:
           love-version: ${{ env.LOVE_VERSION }}
-          icon-path: ./assets/flathub.png
+          icon-path: ./assets/flathub.ico
           love-package: ${{ env.GAME_NAME }}.love
           product-name: "Flathub Arcade"
           output-folder: build-windows
