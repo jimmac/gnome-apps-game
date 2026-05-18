@@ -23,7 +23,7 @@ local ICON_X, ICON_Y_CENTER, TEXT_WIDTH
 -- then expands VW/VH to fill the full screen at that scale.
 local function recalc_scale()
     SW, SH = love.graphics.getDimensions()
-    SCALE = math.max(1, math.floor(math.min(SW, SH) / 128))
+    SCALE = math.max(1, math.floor(math.min(SW, SH) / 160))
     VW    = math.floor(SW / SCALE)
     VH    = math.floor(SH / SCALE)
     OX    = math.floor((SW - VW * SCALE) / 2)  -- 0 or 1 px rounding remainder
