@@ -26,6 +26,26 @@ SMB_HOST="knulli.local"
 SMB_SHARE="share"
 GVFS_BASE="/run/user/$(id -u)/gvfs/smb-share:server=${SMB_HOST},share=${SMB_SHARE}"
 
+# Resolve hostname to IPv4 (avahi/mDNS hostnames can resolve to IPv6 link-local
+# addresses that smbclient doesn't handle well; prefer plain IPv4).
+resolve_ipv4() {
+    local host="$1"
+    # avahi-resolve is the most reliable for .local names
+    if command -v avahi-resolve &>/dev/null; then
+        avahi-resolve -4 -n "$host" 2>/dev/null | awk '{print $2}' | head -1
+        return
+    fi
+    # fallback: host command (first A record)
+    if command -v host &>/dev/null; then
+        host "$host" 2>/dev/null | awk '/has address/{print $4}' | head -1
+        return
+    fi
+}
+
+SMB_HOST_IP=$(resolve_ipv4 "$SMB_HOST")
+# Use IP for smbclient if we got one, keeping the hostname for display
+SMB_TARGET="${SMB_HOST_IP:-$SMB_HOST}"
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -112,7 +132,7 @@ find_knulli_gvfs() {
 # Deploy via smbclient (fallback when GVFS is unavailable)
 deploy_smbclient() {
     local dry_run="${1:-false}"
-    local smb_url="//$SMB_HOST/$SMB_SHARE"
+    local smb_url="//$SMB_TARGET/$SMB_SHARE"
     local remote_ports="roms/ports"
     local remote_game="$remote_ports/$GAME_ID"
 
@@ -179,8 +199,8 @@ find_target() {
 
     # 2. smbclient (direct network, no mount needed)
     if command -v smbclient &>/dev/null; then
-        info "Trying smbclient to $SMB_HOST..." >&2
-        if smbclient -N -L "$SMB_HOST" &>/dev/null; then
+        info "Trying smbclient to $SMB_HOST ($SMB_TARGET)..." >&2
+        if smbclient -N -L "$SMB_TARGET" &>/dev/null; then
             info "Found KNULLI via Samba at $SMB_HOST" >&2
             echo "smb:"
             return 0

@@ -1,12 +1,14 @@
 function love.conf(t)
     t.title = "Flathub Arcade"
     t.version = "11.5"
-    t.window.width = 720
-    t.window.height = 720
+    -- Use 0×0 + desktop fullscreen so the game fills whatever screen it runs on.
+    -- Scale is computed at runtime in love.load() based on actual display size.
+    t.window.width = 0
+    t.window.height = 0
+    t.window.fullscreen = true
+    t.window.fullscreentype = "desktop"  -- keeps native resolution, no mode switch
     t.window.resizable = false
     t.window.vsync = 1
-    t.window.minwidth = 720
-    t.window.minheight = 720
 
     -- crisp pixel scaling
     t.window.highdpi = false

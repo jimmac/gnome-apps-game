@@ -4,11 +4,31 @@
 local apng = require("apng")
 
 -- Virtual resolution & scaling
-local VW, VH = 128, 128        -- virtual canvas
-local SCALE = 5                 -- 128×5 = 640
-local SW, SH = 720, 720        -- screen/window
-local OX = (SW - VW * SCALE) / 2  -- 40px offset to center
-local OY = (SH - VH * SCALE) / 2
+-- Virtual canvas — sized to fill the physical screen at the chosen integer scale.
+-- Minimum 128 px on the short axis; VW/VH expand to cover the rest.
+local VW, VH = 128, 128
+local SCALE = 5
+local SW, SH = 720, 720
+local OX, OY = 0, 0
+
+-- Layout constants that depend on VW/VH — declared here so love.load()
+-- and love.resize() (defined below) can reference them. Values are
+-- computed after the first recalc_scale() call in love.load().
+local TEXT_MARGIN = 4
+local LINE_H      = 7   -- bitmap font line height (5 px glyph + 2 px gap)
+local ICON_X, ICON_Y_CENTER, TEXT_WIDTH
+
+-- Recalculate everything from current window dimensions.
+-- Sets SCALE so ≥128 virtual px fit in the smaller screen axis,
+-- then expands VW/VH to fill the full screen at that scale.
+local function recalc_scale()
+    SW, SH = love.graphics.getDimensions()
+    SCALE = math.max(1, math.floor(math.min(SW, SH) / 128))
+    VW    = math.floor(SW / SCALE)
+    VH    = math.floor(SH / SCALE)
+    OX    = math.floor((SW - VW * SCALE) / 2)  -- 0 or 1 px rounding remainder
+    OY    = math.floor((SH - VH * SCALE) / 2)
+end
 
 -- GNOME HIG colors
 local C = {
@@ -252,6 +272,20 @@ function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
     love.graphics.setBackgroundColor(0, 0, 0)
 
+    -- On a large desktop monitor (not a handheld), switch to a sensible
+    -- resizable window instead of covering the whole display.
+    local dw, dh = love.window.getDesktopDimensions()
+    if math.min(dw, dh) > 800 then
+        love.window.setMode(720, 720, {fullscreen=false, resizable=true, vsync=1, highdpi=false})
+    end
+
+    -- Resolve actual screen size and choose best integer scale
+    recalc_scale()
+    -- Recompute layout constants now that VW/VH are known
+    ICON_X        = math.floor((VW - 32) / 2)
+    ICON_Y_CENTER = math.floor((VH - 32) / 2) - 4
+    TEXT_WIDTH    = VW - TEXT_MARGIN * 2
+
     -- virtual canvas
     vcanvas = love.graphics.newCanvas(VW, VH)
     vcanvas:setFilter("nearest", "nearest")
@@ -336,6 +370,19 @@ function love.draw()
     end
     love.graphics.draw(vcanvas, OX, OY, 0, SCALE, SCALE)
     love.graphics.setShader()
+
+end
+
+function love.resize(w, h)
+    recalc_scale()
+    ICON_X        = math.floor((VW - 32) / 2)
+    ICON_Y_CENTER = math.floor((VH - 32) / 2) - 4
+    TEXT_WIDTH    = VW - TEXT_MARGIN * 2
+    -- recreate canvases at new virtual size
+    vcanvas = love.graphics.newCanvas(VW, VH)
+    vcanvas:setFilter("nearest", "nearest")
+    flathub_canvas = love.graphics.newCanvas(VW, VH)
+    flathub_canvas:setFilter("nearest", "nearest")
 end
 
 function love.keypressed(key)
@@ -652,12 +699,7 @@ end
 ------------------------------------------------------------
 states.game = {}
 
--- icon layout constants
-local ICON_X = (VW - 32) / 2       -- 48, centered
-local ICON_Y_CENTER = (VH - 32) / 2 - 4  -- quiz position (centered)
-local TEXT_MARGIN = 4
-local TEXT_WIDTH = VW - TEXT_MARGIN * 2
-local LINE_H = 7                    -- 5px font + 2px gap
+-- icon layout constants (computed in love.load / love.resize)
 
 -- reveal phases
 local PHASE_IDLE = 0     -- icon centered, waiting for guess
@@ -1127,7 +1169,10 @@ function states.screensaver:draw()
         love.graphics.setCanvas(flathub_canvas)
         love.graphics.clear(0, 0, 0, 0)
         love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.draw(flathub_image, 0, 0)
+        local fw, fh = flathub_image:getDimensions()
+        love.graphics.draw(flathub_image,
+            math.floor((VW - fw) / 2),
+            math.floor((VH - fh) / 2))
         love.graphics.setCanvas(vcanvas)
 
         -- draw with glitch shader if active
