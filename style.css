@@ -23,6 +23,7 @@
   --text-muted: var(--dark-1);
   --accent: var(--blue-3);
   --accent-hover: var(--blue-4);
+  --accent-active: var(--blue-5);
   --radius: 12px;
   --radius-sm: 8px;
   --max-width: 900px;
@@ -100,14 +101,18 @@ a {
 
   & nav {
     display: flex;
-    gap: 1.5rem;
+    gap: 0.2rem;
 
     & a {
       color: var(--text-muted);
       font-weight: 500;
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      transition: background-color var(--transition), color var(--transition);
 
       &:hover {
         color: var(--text);
+        background-color: rgba(255, 255, 255, 0.1);
       }
     }
   }
@@ -153,12 +158,18 @@ a {
     padding: 0.75rem 1.5rem;
     border-radius: 100px;
     font-weight: 600;
-    transition: background var(--transition), transform var(--transition);
+    box-shadow: 0 0 0 0 var(--accent);
+    transition: background var(--transition), box-shadow var(--transition);
 
     &:hover {
       background: var(--accent-hover);
+      box-shadow: 0 0 0 2px var(--accent-hover);
       color: var(--light-1);
-      transform: translateY(-1px);
+    }
+
+    &:active {
+      background: var(--accent-active);
+      box-shadow: 0 0 0 0 var(--accent-active);
     }
   }
 }
@@ -343,11 +354,35 @@ a {
       border-radius: 100px;
       font-weight: 600;
       text-align: center;
-      transition: background var(--transition);
+      box-shadow: 0 0 0 0 var(--accent);
+      transition: background var(--transition), box-shadow var(--transition);
 
       &:hover {
         background: var(--accent-hover);
+        box-shadow: 0 0 0 2px var(--accent-hover);
         color: var(--light-1);
+      }
+
+      &:active {
+        background: var(--accent-active);
+        box-shadow: 0 0 0 0 var(--accent-active);
+      }
+
+      &.secondary {
+        background: var(--dark-5);
+        color: var(--light-2);
+        box-shadow: 0 0 0 0 var(--dark-5);
+
+        &:hover {
+          background: var(--dark-4);
+          box-shadow: 0 0 0 2px var(--dark-4);
+          color: var(--light-1);
+        }
+
+        &:active {
+          background: var(--dark-5);
+          box-shadow: 0 0 0 0 var(--dark-5);
+        }
       }
     }
   }
