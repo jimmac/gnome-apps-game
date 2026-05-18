@@ -80,7 +80,18 @@ a {
 }
 
 /* ── Header ── */
+.hero-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(48px);
+  -webkit-backdrop-filter: blur(48px);
   padding: 1rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
@@ -97,6 +108,10 @@ a {
     gap: 0.5rem;
     font-weight: 700;
     color: var(--text);
+
+    @media (max-width: 540px) {
+      font-size: 0.85rem;
+    }
   }
 
   & nav {
@@ -271,7 +286,6 @@ a {
     background: var(--bg-surface);
     padding: 1.25rem;
     border-radius: var(--radius);
-    border: 1px solid rgba(255, 255, 255, 0.06);
 
     & h3 {
       font-size: 1rem;
@@ -309,7 +323,6 @@ a {
     border-radius: 100px;
     font-weight: 500;
     margin-bottom: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
     transition: color var(--transition), background var(--transition);
 
     &:hover {
@@ -333,8 +346,7 @@ a {
     background: var(--bg-surface);
     padding: 1.25rem;
     border-radius: var(--radius);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    transition: border-color var(--transition), transform var(--transition);
+    transition: background var(--transition);
 
     &:hover {
       background: rgba(255, 255, 255, 0.04);
