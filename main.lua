@@ -14,7 +14,7 @@ local OX, OY = 0, 0
 -- Layout constants that depend on VW/VH — declared here so love.load()
 -- and love.resize() (defined below) can reference them. Values are
 -- computed after the first recalc_scale() call in love.load().
-local TEXT_MARGIN = 8
+local TEXT_MARGIN = 12
 local LINE_H      = 7   -- bitmap font line height (5 px glyph + 2 px gap)
 local ICON_X, ICON_Y_CENTER, TEXT_WIDTH
 
