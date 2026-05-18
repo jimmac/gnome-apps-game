@@ -756,13 +756,14 @@ function states.game:update(dt)
         end
     end
 
-    -- gamepad held-nav
+    -- gamepad held-nav (dpad or left stick)
     if self.input_delay <= 0 then
         for _, js in ipairs(love.joystick.getJoysticks()) do
             if js:isGamepad() then
-                if js:isGamepadDown("dpright") then
+                local lx = js:getGamepadAxis("leftx")
+                if js:isGamepadDown("dpright") or lx > 0.5 then
                     self:go(1)
-                elseif js:isGamepadDown("dpleft") then
+                elseif js:isGamepadDown("dpleft") or lx < -0.5 then
                     self:go(-1)
                 end
             end
