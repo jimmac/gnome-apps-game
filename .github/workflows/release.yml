@@ -46,7 +46,6 @@ jobs:
 
       - name: Generate macOS .icns icon
         run: |
-          # Create iconset directory with all required sizes
           mkdir -p icon.iconset
           for size in 16 32 128 256 512; do
             sips -z $size $size ./assets/flathub.png --out icon.iconset/icon_${size}x${size}.png
@@ -55,23 +54,34 @@ jobs:
               sips -z $double $double ./assets/flathub.png --out icon.iconset/icon_${size}x${size}@2x.png
             fi
           done
-          iconutil -c icns icon.iconset -o ./assets/flathub.icns
+          iconutil -c icns icon.iconset -o flathub.icns
 
-      - name: Build macOS portable
-        uses: love-actions/love-actions-macos-portable@v1
-        with:
-          love-version: ${{ env.LOVE_VERSION }}
-          app-name: "Flathub Arcade"
-          bundle-id: "eu.jimmac.FlathubArcade"
-          icon-path: ./assets/flathub.icns
-          love-package: ${{ env.GAME_NAME }}.love
-          product-name: "Flathub Arcade"
-          output-folder: build-macos
+      - name: Download and assemble LÖVE app
+        run: |
+          # Download LÖVE for macOS
+          curl -L -o love.zip https://github.com/love2d/love/releases/download/${{ env.LOVE_VERSION }}/love-${{ env.LOVE_VERSION }}-macos.zip
+          unzip -q love.zip
+
+          # Rename the .app bundle
+          mv love.app "Flathub Arcade.app"
+
+          # Embed the .love file
+          cp ${{ env.GAME_NAME }}.love "Flathub Arcade.app/Contents/Resources/"
+
+          # Replace the icon
+          cp flathub.icns "Flathub Arcade.app/Contents/Resources/Love.icns"
+          cp flathub.icns "Flathub Arcade.app/Contents/Resources/GameIcon.icns"
+
+          # Update Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleName 'Flathub Arcade'" "Flathub Arcade.app/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier eu.jimmac.FlathubArcade" "Flathub Arcade.app/Contents/Info.plist"
+
+          # Ad-hoc sign so macOS doesn't reject it outright
+          codesign --force --deep -s - "Flathub Arcade.app"
 
       - name: Zip macOS app
         run: |
-          cd build-macos
-          zip -r -y ../${{ env.GAME_NAME }}-macos.zip "Flathub Arcade.app"
+          zip -r -y ${{ env.GAME_NAME }}-macos.zip "Flathub Arcade.app"
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
