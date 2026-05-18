@@ -1,6 +1,6 @@
-# GNOME Icons
+# Flathub Arcade
 
-A retro quiz game — can you name all 166 GNOME apps from their icons?
+A retro quiz game — can you name all GNOME apps from their icons?
 
 ![cover](cover.png)
 
@@ -41,10 +41,8 @@ flatpak run org.love2d.love2d gnome-icons.love
 
 The game runs on ARM handhelds via PortMaster's LÖVE 11.5 runtime.
 
-1. Copy `gnome-icons.love` to `roms/ports/gnome-icons/` on the SD card
-2. Copy `GNOME Icons.sh` to `roms/ports/`
-3. Refresh gamelists in EmulationStation
-
+See `tools/deploy-cubexx.sh` for info on how to deploy to the console over
+a microSD card or SMB share on a local area network.
 
 ## License
 
