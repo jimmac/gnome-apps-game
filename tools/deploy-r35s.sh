@@ -154,9 +154,26 @@ tree.write(path, encoding="unicode", xml_declaration=True)
 PYEOF
 }
 
+# If the ext4 STORAGE partition is mounted read-only (common with this
+# card's recurring bitmap errors), unmount, fsck, and remount it rw.
+ensure_rw() {
+    local mountpoint="$1"
+    if mount | grep -q "${mountpoint}.*\bro\b"; then
+        warn "Filesystem is read-only — running e2fsck..."
+        local dev
+        dev=$(mount | grep "${mountpoint}" | awk '{print $1}')
+        udisksctl unmount --block-device "$dev" 2>/dev/null || true
+        pkexec e2fsck -y "$dev" 2>&1 | tail -3
+        udisksctl mount --block-device "$dev"
+        info "Remounted read-write."
+    fi
+}
+
 deploy() {
     local mountpoint="$1"
     local dry_run="${2:-false}"
+
+    ensure_rw "$mountpoint"
 
     local ports_path="$mountpoint/$PORTS_SUBDIR"
     local game_path="$ports_path/$GAME_ID"
