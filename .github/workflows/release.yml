@@ -23,7 +23,7 @@ jobs:
       - name: Build .love file
         uses: love-actions/love-actions-core@v1
         with:
-          build-list: "./assets/ ./conf.lua ./main.lua"
+          build-list: "./assets/ ./conf.lua ./main.lua ./apng.lua"
           package-path: ${{ env.GAME_NAME }}.love
 
       - name: Upload .love artifact
