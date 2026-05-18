@@ -1,6 +1,8 @@
 -- Flathub Arcade
 -- (CC BY-SA 4.0) jimmac.eu
 
+local apng = require("apng")
+
 -- Virtual resolution & scaling
 local VW, VH = 128, 128        -- virtual canvas
 local SCALE = 5                 -- 128×5 = 640
@@ -382,6 +384,13 @@ function load_icons()
             local img = love.graphics.newImage(path)
             local key = file:gsub("%.png$", "")
             local m = meta[key]
+            -- Try to load as APNG (animated PNG)
+            local anim_data = apng.load(path)
+            local anim_player = nil
+            if anim_data then
+                anim_player = apng.newPlayer(anim_data)
+            end
+
             local entry = {
                 image = img,
                 key = key,
@@ -390,6 +399,7 @@ function load_icons()
                 author = m and m.author or "",
                 desc = m and m.desc or "",
                 flatpak = m and m.flatpak or nil,
+                anim = anim_player,  -- nil for static PNGs
             }
             table.insert(icons, entry)
         end
@@ -780,6 +790,12 @@ function states.game:update(dt)
         r.desc_alpha = math.min(r.timer / 0.4, 1)  -- fade in over 0.4s
     end
 
+    -- update APNG animation for current icon
+    local icon = icons[self.index]
+    if icon and icon.anim and icon.anim.playing then
+        icon.anim:update(dt)
+    end
+
     -- counter fade-out
     if self.counter_alpha > 0 then
         if self.counter_fade_delay > 0 then
@@ -791,6 +807,11 @@ function states.game:update(dt)
 end
 
 function states.game:go(dir)
+    -- stop any playing animation on current icon before switching
+    local prev_icon = icons[self.index]
+    if prev_icon and prev_icon.anim then
+        prev_icon.anim:stop()
+    end
     local ni = self.index + dir
     if ni < 1 then ni = icon_count end
     if ni > icon_count then ni = 1 end
@@ -813,6 +834,11 @@ function states.game:go(dir)
 end
 
 function states.game:jump_random()
+    -- stop any playing animation on current icon
+    local prev_icon = icons[self.index]
+    if prev_icon and prev_icon.anim then
+        prev_icon.anim:stop()
+    end
     self.index = math.random(1, icon_count)
     self.trans.active = true
     self.trans.timer = self.trans.duration
@@ -867,6 +893,10 @@ function states.game:start_reveal()
     r.text_y = r.icon_y_target + 32 + 4
     sfx_reveal:stop()
     sfx_reveal:play()
+    -- start APNG animation if this icon has one
+    if icon.anim then
+        icon.anim:play()
+    end
 end
 
 function states.game:keypressed(key)
@@ -900,7 +930,12 @@ function states.game:draw()
     love.graphics.setCanvas(icon_canvas)
     love.graphics.clear(0, 0, 0, 0)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(icon.image, 0, 0)
+    -- use animated frame if available and playing, otherwise static
+    if icon.anim and icon.anim.playing then
+        love.graphics.draw(icon.anim:getImage(), 0, 0)
+    else
+        love.graphics.draw(icon.image, 0, 0)
+    end
     love.graphics.setCanvas(vcanvas)
 
     -- draw icon with shader effects
