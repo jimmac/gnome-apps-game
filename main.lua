@@ -217,6 +217,12 @@ function bfont_wrap(font, text, max_width)
     return lines
 end
 
+-- Gamepad confirm button — auto-detected from first face-button press in
+-- the intro (whichever of "a"/"b" the player presses to start is confirm).
+-- Falls back to "a" (SDL south/bottom) if never explicitly detected.
+local confirm_btn = "a"
+local function other_btn(b) return b == "a" and "b" or "a" end
+
 -- canvases
 local vcanvas = nil    -- main 128×128 virtual screen
 local icon_canvas = nil -- 32×32 icon for shader effects
@@ -266,6 +272,105 @@ local logo_bot = nil
 
 -- flathub overlay
 local flathub_image = nil
+
+------------------------------------------------------------
+-- PAUSE MENU
+-- Defined here so bfont, crt_enabled, confirm_btn etc. are
+-- already in scope as upvalues.
+------------------------------------------------------------
+local menu_open   = false
+local menu_alpha  = 0      -- 0..1, animated
+local menu_cursor = 1
+local quit_anim   = false
+local quit_timer  = 0
+local QUIT_DUR    = 0.75   -- seconds for full shutdown animation
+
+local function start_quit()
+    quit_anim  = true
+    quit_timer = 0
+    menu_open  = false
+    menu_alpha = 0
+end
+local menu_items  = {
+    {
+        label  = "< CONTINUE",
+        action = function() menu_open = false end,
+    },
+    {
+        label = "CRT EFFECT",
+        get   = function() return crt_enabled end,
+        set   = function(v) crt_enabled = v end,
+    },
+    {
+        label = "FLIP BUTTONS",
+        get   = function() return confirm_btn == "b" end,
+        set   = function(v) confirm_btn = v and "b" or "a" end,
+    },
+    {
+        label = "QUIT GAME",
+        action = function() start_quit() end,
+    },
+}
+
+local function menu_activate()
+    local item = menu_items[menu_cursor]
+    if item.action then
+        item.action()
+    elseif item.set then
+        item.set(not item.get())
+    end
+end
+
+local function menu_nav(dir)
+    menu_cursor = ((menu_cursor - 1 + dir) % #menu_items) + 1
+end
+
+local function draw_menu()
+    local a = menu_alpha
+    if a <= 0 then return end
+
+    -- full black background, fades in
+    love.graphics.setColor(0, 0, 0, a)
+    love.graphics.rectangle("fill", 0, 0, VW, VH)
+
+    -- don't draw items until background is mostly in
+    local item_a = math.max(0, (a - 0.5) * 2)
+    if item_a <= 0 then return end
+
+    local pad_x = 10
+    local row_h = 16   -- generous spacing
+    local gap   = 4
+    local pw    = VW - pad_x * 2
+    local total = #menu_items * row_h + (#menu_items - 1) * gap
+    local sy    = math.floor((VH - total) / 2)
+
+    for i, item in ipairs(menu_items) do
+        local iy  = sy + (i - 1) * (row_h + gap)
+        local sel = i == menu_cursor
+        -- vertical centre of font (5px tall) within row
+        local ty  = iy + math.floor((row_h - 5) / 2)
+
+        if sel then
+            -- white pill, black text
+            love.graphics.setColor(1, 1, 1, item_a)
+            love.graphics.rectangle("fill", pad_x, iy, pw, row_h, row_h/2, row_h/2)
+            love.graphics.setColor(0, 0, 0, item_a)
+        else
+            love.graphics.setColor(1, 1, 1, item_a * 0.55)
+        end
+
+        bfont_printf(bfont_w, item.label, pad_x + 10, ty, pw - 20, "left")
+
+        if item.get then
+            local on  = item.get()
+            local val = on and "ON" or "OFF"
+            if not sel then
+                love.graphics.setColor(1, 1, 1, item_a * (on and 0.55 or 0.25))
+            end
+            bfont_printf(bfont_w, val, pad_x, ty, pw - 10, "right")
+        end
+    end
+end
 
 function love.load()
     math.randomseed(os.time())
@@ -339,6 +444,22 @@ function love.load()
 end
 
 function love.update(dt)
+    -- quit animation timer
+    if quit_anim then
+        quit_timer = quit_timer + dt
+        if quit_timer >= QUIT_DUR then
+            love.event.quit()
+        end
+    end
+
+    -- animate menu fade
+    local fade_speed = 10
+    if menu_open then
+        menu_alpha = math.min(1, menu_alpha + dt * fade_speed)
+    else
+        menu_alpha = math.max(0, menu_alpha - dt * fade_speed)
+    end
+
     if current_state and current_state.update then
         current_state:update(dt)
     end
@@ -354,23 +475,55 @@ function love.update(dt)
 end
 
 function love.draw()
-    -- draw current state to virtual canvas
+    -- draw current state (+ menu overlay if open) to virtual canvas
     love.graphics.setCanvas(vcanvas)
     love.graphics.clear(C.bg[1], C.bg[2], C.bg[3], 1)
     if current_state and current_state.draw then
         current_state:draw()
     end
+    if menu_open then draw_menu() end
     love.graphics.setCanvas()
 
-    -- draw virtual canvas scaled up to screen, centered
+    -- scale virtual canvas to screen with optional CRT shader
     love.graphics.setColor(1, 1, 1)
     if crt_enabled and crt_shader then
         crt_shader:send("scale", SCALE * 1.0)
         love.graphics.setShader(crt_shader)
     end
-    love.graphics.draw(vcanvas, OX, OY, 0, SCALE, SCALE)
-    love.graphics.setShader()
 
+    if quit_anim then
+        -- CRT power-off: vertical collapse → dot → fade
+        local t = math.min(1, quit_timer / QUIT_DUR)
+        local cx = OX + (VW * SCALE) / 2
+        local cy = OY + (VH * SCALE) / 2
+
+        if t < 0.5 then
+            -- Phase 1: vertical squish (ease-in²)
+            local pt    = t / 0.5
+            local ease  = pt * pt
+            local ys    = SCALE * math.max(0.005, 1 - ease)
+            love.graphics.draw(vcanvas, OX, cy - VH * ys / 2, 0, SCALE, ys)
+            love.graphics.setShader()
+            -- bright scanline glow as picture collapses
+            love.graphics.setColor(1, 1, 1, ease * 0.9)
+            love.graphics.rectangle("fill", OX, cy - SCALE, VW * SCALE, SCALE * 2)
+        else
+            love.graphics.setShader()
+            -- Phase 2: line shrinks to dot and fades
+            local pt    = (t - 0.5) / 0.5
+            local lw    = VW * SCALE * math.max(0, 1 - pt * 2.5)
+            local alpha = math.max(0, 1 - pt * 1.4)
+            love.graphics.setColor(1, 1, 1, alpha)
+            if lw > SCALE then
+                love.graphics.rectangle("fill", cx - lw / 2, cy - SCALE, lw, SCALE * 2)
+            else
+                love.graphics.ellipse("fill", cx, cy, SCALE * 1.5, SCALE * 1.5)
+            end
+        end
+    else
+        love.graphics.draw(vcanvas, OX, OY, 0, SCALE, SCALE)
+        love.graphics.setShader()
+    end
 end
 
 function love.resize(w, h)
@@ -387,11 +540,22 @@ end
 
 function love.keypressed(key)
     idle_timer = 0
-    if key == "escape" then
-        love.event.quit()
+    if menu_open then
+        if key == "escape" or key == "tab" then
+            menu_open = false
+        elseif key == "up" then
+            menu_nav(-1)
+        elseif key == "down" then
+            menu_nav(1)
+        elseif key == "return" or key == "x" or key == "space" then
+            menu_activate()
+        end
+        return  -- swallow all input while menu is open
     end
-    if key == "tab" then
-        crt_enabled = not crt_enabled
+    if key == "escape" or key == "tab" then
+        menu_open   = true
+        menu_cursor = 1
+        return
     end
     if current_state and current_state.keypressed then
         current_state:keypressed(key)
@@ -400,8 +564,26 @@ end
 
 function love.gamepadpressed(joystick, button)
     idle_timer = 0
-    if button == "back" then  -- SELECT / SE button
+    if button == "back" then   -- SELECT: direct CRT toggle, always
         crt_enabled = not crt_enabled
+        return
+    end
+    if menu_open then
+        if button == "start" then
+            menu_open = false
+        elseif button == "dpup" then
+            menu_nav(-1)
+        elseif button == "dpdown" then
+            menu_nav(1)
+        elseif button == confirm_btn or button == other_btn(confirm_btn) then
+            menu_activate()
+        end
+        return
+    end
+    if button == "start" then
+        menu_open   = true
+        menu_cursor = 1
+        return
     end
     if current_state and current_state.gamepadpressed then
         current_state:gamepadpressed(joystick, button)
@@ -691,6 +873,10 @@ function states.intro:keypressed(key)
 end
 
 function states.intro:gamepadpressed(joystick, button)
+    -- learn which face button the player uses as confirm
+    if button == "a" or button == "b" then
+        confirm_btn = button
+    end
     set_state("game")
 end
 
@@ -951,9 +1137,9 @@ function states.game:keypressed(key)
 end
 
 function states.game:gamepadpressed(joystick, button)
-    if button == "a" then
+    if button == confirm_btn then
         self:start_reveal()
-    elseif button == "b" then
+    elseif button == other_btn(confirm_btn) then
         self:jump_random()
     end
 end

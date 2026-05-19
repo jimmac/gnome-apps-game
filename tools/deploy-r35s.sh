@@ -74,13 +74,19 @@ package_love() {
 # Auto-detect the STORAGE partition by label or by presence of games-internal/
 find_storage() {
     local candidates=()
-    for base in "/run/media/$USER" "/run/media/$(whoami)" "/media/$USER" /mnt; do
+    # Only consider directories that are actually mounted (not stale paths)
+    local mounted
+    mounted=$(mount | awk '{print $3}')
+
+    for base in "/run/media/$USER" "/media/$USER" /mnt; do
         [ -d "$base" ] || continue
         for dir in "$base"/*/; do
             [ -d "$dir" ] || continue
+            local mp="${dir%/}"
+            echo "$mounted" | grep -qxF "$mp" || continue
             # ROCKNIX data partition has games-internal/
-            if [ -d "${dir}games-internal" ]; then
-                candidates+=("${dir%/}")
+            if [ -d "${mp}/games-internal" ]; then
+                candidates+=("$mp")
             fi
         done
     done
