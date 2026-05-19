@@ -278,9 +278,11 @@ local flathub_image = nil
 -- Defined here so bfont, crt_enabled, confirm_btn etc. are
 -- already in scope as upvalues.
 ------------------------------------------------------------
-local menu_open   = false
-local menu_alpha  = 0      -- 0..1, animated
-local menu_cursor = 1
+local menu_open      = false
+local menu_alpha     = 0      -- 0..1, animated
+local menu_cursor    = 1
+local menu_nav_delay = 0
+local MENU_NAV_RATE  = 0.18   -- seconds between repeat-nav steps on held stick
 local quit_anim   = false
 local quit_timer  = 0
 local QUIT_DUR    = 0.75   -- seconds for full shutdown animation
@@ -462,6 +464,27 @@ function love.update(dt)
 
     if current_state and current_state.update then
         current_state:update(dt)
+    end
+
+    -- analog stick up/down for menu (mirrors the dpup/dpdown events)
+    if menu_open then
+        menu_nav_delay = math.max(menu_nav_delay - dt, 0)
+        if menu_nav_delay <= 0 then
+            for _, js in ipairs(love.joystick.getJoysticks()) do
+                if js:isGamepad() then
+                    local ly = js:getGamepadAxis("lefty")
+                    if ly < -0.5 then
+                        menu_nav(-1)
+                        menu_nav_delay = MENU_NAV_RATE
+                    elseif ly > 0.5 then
+                        menu_nav(1)
+                        menu_nav_delay = MENU_NAV_RATE
+                    end
+                end
+            end
+        end
+    else
+        menu_nav_delay = 0
     end
 
     -- idle timer (only in game state)

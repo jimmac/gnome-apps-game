@@ -124,6 +124,7 @@ return {
   ["video-trimmer"] = { name="Video Trimmer", author="Ivan Molodetskikh", desc="Trim videos quickly", flatpak="org.gnome.gitlab.YaLTeR.VideoTrimmer"},
   videos = { name="Videos", author="The GNOME developers", desc="Play movies", flatpak="org.gnome.Totem"},
   vinyl = { name="Vinyl", author="M23Snezhok", desc="Elegant music player", flatpak="page.codeberg.M23Snezhok.Vinyl"},
+  wardrobe = { name="Wardrobe", author="Nathan Perlman", desc="Download community themes and wallpapers for GNOME", flatpak="io.github.swordpuffin.wardrobe"},
   warp = { name="Warp", author="Fina Wilke", desc="Fast and secure file transfer", flatpak="app.drey.Warp"},
   weather = { name="Weather", author="The GNOME Project", desc="Show weather conditions and forecast", flatpak="org.gnome.Weather"},
   web = { name="Web", author="The GNOME Project", desc="Browse the web", flatpak="org.gnome.Epiphany"},
