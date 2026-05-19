@@ -61,57 +61,7 @@
       </section>
     </div>
 
-    <section class="platforms">
-      <div class="container">
-        <h2>Runs on your devices.</h2>
-        <div class="platform-icons">
-          <div class="platform">
-            <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <!-- Linux laptop -->
-              <rect x="16" y="18" width="48" height="34" rx="3"/>
-              <line x1="12" y1="56" x2="68" y2="56"/>
-              <path d="M12 56 Q12 60 16 60 L64 60 Q68 60 68 56"/>
-              <rect x="24" y="24" width="32" height="22" rx="1" fill="none"/>
-            </svg>
-            <span>Linux</span>
-          </div>
-          <div class="platform">
-            <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <!-- Windows desktop -->
-              <rect x="14" y="12" width="52" height="40" rx="3"/>
-              <rect x="20" y="17" width="40" height="29" rx="1" fill="none"/>
-              <line x1="40" y1="52" x2="40" y2="60"/>
-              <line x1="28" y1="60" x2="52" y2="60"/>
-            </svg>
-            <span>Windows</span>
-          </div>
-          <div class="platform">
-            <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <!-- macOS laptop -->
-              <path d="M16 18 Q16 15 19 15 L61 15 Q64 15 64 18 L64 48 Q64 50 61 50 L19 50 Q16 50 16 48 Z"/>
-              <rect x="22" y="20" width="36" height="25" rx="1" fill="none"/>
-              <path d="M10 54 Q10 50 16 50 L64 50 Q70 50 70 54 Q70 56 68 56 L12 56 Q10 56 10 54"/>
-            </svg>
-            <span>macOS</span>
-          </div>
-          <div class="platform">
-            <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <!-- Handheld console -->
-              <rect x="12" y="20" width="56" height="40" rx="8"/>
-              <rect x="26" y="25" width="28" height="22" rx="2" fill="none"/>
-              <circle cx="21" cy="38" r="4" fill="none"/>
-              <circle cx="63" cy="32" r="2.5"/>
-              <circle cx="59" cy="38" r="2.5"/>
-              <circle cx="63" cy="44" r="2.5"/>
-              <circle cx="67" cy="38" r="2.5"/>
-              <line x1="33" y1="52" x2="37" y2="52"/>
-              <line x1="43" y1="52" x2="47" y2="52"/>
-            </svg>
-            <span>Handheld</span>
-          </div>
-        </div>
-      </div>
-    </section>
+
 
     <section class="about" id="about">
       <div class="container">
@@ -205,11 +155,43 @@
 
   <footer class="site-footer">
     <div class="container">
-      <div class="footer-links">
-        <a href="https://github.com/jimmac/flathub-arcade">GitHub</a>
-        <a href="https://flathub.org">Flathub</a>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="logo">Flathub Arcade</a>
+          <p>A retro pixel-art quiz game featuring dozens of GNOME apps.</p>
+        </div>
+        <div class="footer-links">
+          <ul>
+            <li><a href="https://github.com/jimmac/flathub-arcade">GitHub</a></li>
+            <li><a href="https://flathub.org">Flathub</a></li>
+            <li><a href="https://love2d.org">LÖVE</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <ul>
+            <li><a href="https://jimmac.eu">jimmac.eu</a></li>
+            <li><a href="https://blog.jimmac.eu">Blog</a></li>
+            <li><a href="https://art.jimmac.eu">Art</a></li>
+            <li><a href="https://music.jimmac.eu">Music</a></li>
+          </ul>
+        </div>
+        <div class="footer-social">
+          <div class="social-links">
+            <a href="https://mastodon.social/@jimmac" title="Mastodon" rel="me">
+              <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M7.478 0C5.56.016 3.716.223 2.64.717c0 0-2.132.954-2.132 4.208 0 .745-.015 1.636.009 2.58.077 3.183.583 6.319 3.525 7.098 1.357.359 2.522.434 3.46.382 1.7-.094 2.656-.607 2.656-.607l-.057-1.234s-1.215.383-2.58.337c-1.353-.047-2.781-.146-3-1.807a3.406 3.406 0 0 1-.03-.466s1.328.325 3.01.402c1.03.047 1.994-.06 2.974-.177 1.88-.225 3.516-1.383 3.722-2.44.324-1.668.297-4.068.297-4.068 0-3.254-2.132-4.208-2.132-4.208C11.288.223 9.443.016 7.525 0Zm-2.17 2.542c.798 0 1.403.308 1.803.922l.389.651.389-.651c.4-.614 1.005-.922 1.803-.922.69 0 1.247.243 1.672.717.412.473.617 1.113.617 1.918v3.94H10.42V5.293c0-.806-.34-1.215-1.018-1.215-.75 0-1.126.485-1.126 1.445v2.093H6.724V5.523c0-.96-.376-1.445-1.126-1.445-.678 0-1.018.409-1.018 1.215v3.824H3.02v-3.94c0-.805.204-1.445.616-1.918.425-.474.981-.717 1.672-.717Z" /></svg>
+            </a>
+            <a href="https://instagram.com/jimmacfx" title="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M13.322 1.004H2.683c-.915 0-1.677.724-1.677 1.64V13.32c0 .915.762 1.64 1.677 1.64h10.64c.914 0 1.677-.725 1.677-1.64V2.643c-.038-.877-.763-1.64-1.678-1.64zm-2.288 2.211c0-.229.19-.42.42-.42h1.296c.229 0 .42.191.42.42v1.297c0 .229-.191.42-.42.42h-1.296a.423.423 0 01-.42-.42zm-3.05 2.136c1.487 0 2.707 1.182 2.707 2.669s-1.22 2.67-2.707 2.67a2.653 2.653 0 01-2.67-2.67 2.653 2.653 0 012.67-2.67zm5.799 7.893c0 .229-.19.42-.42.42H2.76a.423.423 0 01-.42-.42V6.685h1.754c-.229.343-.305.954-.305 1.335 0 2.326 1.907 4.233 4.271 4.233s4.27-1.907 4.27-4.233c0-.381-.037-.992-.342-1.335h1.754z"/></svg>
+            </a>
+            <a href="https://pixelfed.social/jimmac" title="Pixelfed" rel="me">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 0C3.594 0 0 3.594 0 8c0 4.406 3.594 8 8 8 4.406 0 8-3.594 8-8 0-4.406-3.594-8-8-8Zm0 2c3.326 0 6 2.674 6 6s-2.674 6-6 6-6-2.674-6-6 2.674-6 6-6Zm.873 2.567c1.497 0 2.71 1.175 2.71 2.625S10.37 9.818 8.873 9.818h-1.59l-2.266 2.159V6.08c0-.836.7-1.514 1.563-1.514z"/></svg>
+            </a>
+            <a href="https://www.youtube.com/@jimmac" title="YouTube" rel="me">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M14.2 4.65a1.8 1.8 0 00-1.27-1.27C11.9 3.1 8 3.1 8 3.1s-3.9 0-4.93.28A1.8 1.8 0 001.8 4.65 18.6 18.6 0 001.5 8c-.01 1.13.09 2.26.3 3.35a1.8 1.8 0 001.27 1.27c1.03.28 4.93.28 4.93.28s3.9 0 4.93-.28a1.8 1.8 0 001.27-1.27c.21-1.09.31-2.22.3-3.35.01-1.13-.09-2.26-.3-3.35zM6.6 10.15V5.85L10.4 8 6.6 10.15z"/></svg>
+            </a>
+          </div>
+        </div>
       </div>
-      <p>Made with LÖVE by <a href="https://jimmac.eu">jimmac</a></p>
     </div>
   </footer>
 
