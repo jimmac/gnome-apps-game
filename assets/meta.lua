@@ -159,7 +159,7 @@ return {
   plots = { name="Plots", author="GNOME", desc="Plot mathematical functions"},
   qwertone = { name="Qwertone", author="Andrii Zymohliad", desc="A tuner and a metronome using QWERTY keyboard as a piano", flatpak="com.gitlab.azymohliad.Qwertone"},
   reflection = { name="Reflection", author="Modal Collective", desc="A collaborative text editor. Built with p2panda local-first peer to peer protocol."},
-  rissole = { name="Rissole", author="GNOME", desc="A recipe manager"},
+  rissole = { name="Rissole", author="Carlos Garnacho", desc="A feed reader"},
   rotor = { name="Rotor", author="GNOME", desc="Encode and decode text ciphers"},
   screenshot = { name="Screenshot", author="GNOME", desc="Capture the screen", flatpak="org.gnome.Screenshot"},
   settings = { name="Settings", author="GNOME", desc="Configure your system"},
