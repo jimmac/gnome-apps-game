@@ -5,8 +5,8 @@ local apng = require("apng")
 
 -- Virtual resolution & scaling
 -- Virtual canvas — sized to fill the physical screen at the chosen integer scale.
--- Minimum 128 px on the short axis; VW/VH expand to cover the rest.
-local VW, VH = 128, 128
+-- Minimum 160 px on the short axis; VW/VH expand to cover the rest.
+local VW, VH = 512, 512
 local SCALE = 5
 local SW, SH = 720, 720
 local OX, OY = 0, 0
@@ -19,7 +19,7 @@ local LINE_H      = 7   -- bitmap font line height (5 px glyph + 2 px gap)
 local ICON_X, ICON_Y_CENTER, TEXT_WIDTH
 
 -- Recalculate everything from current window dimensions.
--- Sets SCALE so ≥128 virtual px fit in the smaller screen axis,
+-- Sets SCALE so ≥160 virtual px fit in the smaller screen axis,
 -- then expands VW/VH to fill the full screen at that scale.
 local function recalc_scale()
     SW, SH = love.graphics.getDimensions()
@@ -224,9 +224,9 @@ local confirm_btn = "a"
 local function other_btn(b) return b == "a" and "b" or "a" end
 
 -- canvases
-local vcanvas = nil    -- main 128×128 virtual screen
+local vcanvas = nil    -- main VW×VH virtual screen
 local icon_canvas = nil -- 32×32 icon for shader effects
-local flathub_canvas = nil -- 128×128 for flathub overlay
+local flathub_canvas = nil -- VW×VH flathub overlay
 
 -- bitmap fonts
 local bfont = nil      -- narrow 5px bitmap font (descriptions)
@@ -401,7 +401,7 @@ function love.load()
     icon_canvas = love.graphics.newCanvas(32, 32)
     icon_canvas:setFilter("nearest", "nearest")
 
-    -- flathub overlay canvas (128×128)
+    -- flathub overlay canvas (VW×VH)
     flathub_canvas = love.graphics.newCanvas(VW, VH)
     flathub_canvas:setFilter("nearest", "nearest")
 

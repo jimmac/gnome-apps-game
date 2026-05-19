@@ -1,5 +1,5 @@
 -- Auto-generated from Flathub appstream data
--- Edit descriptions to fit ~29 chars/line on 128x128 canvas
+-- Edit descriptions to fit ~29 chars/line on the virtual canvas
 return {
   alpaca = { name="Alpaca", author="Jeffry Samuel Eduarte Rojas", desc="Chat with AI models", flatpak="com.jeffser.Alpaca"},
   amberol = { name="Amberol", author="Emmanuele Bassi", desc="Plays music, and nothing else", flatpak="io.bassi.Amberol"},
