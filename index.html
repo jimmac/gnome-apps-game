@@ -22,10 +22,9 @@
   <link rel="icon" type="image/png" href="favicon.png">
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+  <link rel="preload" href="fonts/Inter-roman.var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -146,7 +145,14 @@
         <div class="linux-note">
           <h3>Linux</h3>
           <p>Install <a href="https://flathub.org/en/apps/org.love2d.love2d">LÖVE from Flathub</a> and run the .love bundle directly:</p>
-          <code>flatpak run org.love2d.love2d flathub-arcade.love</code>
+          <div class="code-container">
+            <code>flatpak run org.love2d.love2d flathub-arcade.love</code>
+            <button class="copy-btn" title="Copy to clipboard">
+              <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 3 10 C 1.89543045 10, 1 9.10456944, 1 8 L 1 3 C 1 1.89543045, 1.89543045 1, 3 1 L 8 1 C 9.10456944 1, 10 1.89543045, 10 3 M 6 8 L 6 13 C 6 14.1045694, 6.89543056 15, 8 15 L 13 15 C 14.1045694 15, 15 14.1045694, 15 13 L 15 8 C 15 6.89543056, 14.1045694 6, 13 6 L 8 6 C 6.89543056 6, 6 6.89543056, 6 8 Z" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -225,6 +231,20 @@
         badge.textContent = "No release yet";
       }
     })();
+
+    // Copy to clipboard functionality
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code').innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          const originalSvg = btn.innerHTML;
+          btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M 4 8 L 7 11 L 12 4" /></svg>';
+          setTimeout(() => {
+            btn.innerHTML = originalSvg;
+          }, 2000);
+        });
+      });
+    });
   </script>
 
 </body>
