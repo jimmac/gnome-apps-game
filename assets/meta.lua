@@ -148,7 +148,7 @@ return {
   help = { name="Help", author="GNOME", desc="Read the GNOME desktop help"},
   highscore = { name="Highscore", author="Alexander Mikhaylenko", desc="Retro gaming with libretro"},
   letterpress = { name="Letterpress", author="GNOME", desc="Create beautiful ASCII text art"},
-  lipi = { name="Lipi", author="GNOME", desc="Install fonts"},
+  lipi = { name="Lipi", author="Shone Binu", desc="Install fonts"},
   vocalis = { name="Vocalis", author="Christopher Davis", desc="Predecessor to Sound Recorder"},
   mesero = { name="Mesero", author="GNOME", desc="Wacom tablet configuration"},
   mixtape = { name="Mixtape", author="GNOME", desc="Create and share playlists"},
