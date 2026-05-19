@@ -413,14 +413,14 @@ a {
         box-shadow: 0 0 0 0 var(--dark-5);
 
         &:hover {
-          background: var(--dark-4);
-          box-shadow: 0 0 0 2px var(--dark-4);
+          background: var(--accent-hover);
+          box-shadow: 0 0 0 2px var(--accent-hover);
           color: var(--light-1);
         }
 
         &:active {
-          background: var(--dark-5);
-          box-shadow: 0 0 0 0 var(--dark-5);
+          background: var(--accent-active);
+          box-shadow: 0 0 0 0 var(--accent-active);
         }
       }
     }
