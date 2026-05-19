@@ -52,7 +52,7 @@ return {
   elfin = { name="Elfin", author="Kerem Bayülgen", desc="Browse and play your Jellyfin library"},
   emblem = { name="Emblem", author="Maximiliano Sandoval", desc="Generate project avatars", flatpak="org.gnome.design.Emblem"},
   errands = { name="Errands", author="Vlad Krupinskii", desc="Manage your tasks", flatpak="io.github.mrvladus.List"},
-  evince = { name="Document Viewer", author="The Evince Developers", desc="Document viewer for popular document formats", flatpak="org.gnome.Evince"},
+  evince = { name="Evince", author="The Evince Developers", desc="Document viewer for popular document formats", flatpak="org.gnome.Evince"},
   exchange = { name="Exchange", author="Shone Binu", desc="Convert between XML and Blueprint", flatpak="io.github.shonebinu.Exchange"},
   exhibit = { name="Exhibit", author="Nokse", desc="Preview your 3D models", flatpak="io.github.nokse22.Exhibit"},
   ["eye-of-gnome"] = { name="Eye of GNOME", author="The Eye of GNOME Team", desc="Browse and rotate images", flatpak="org.gnome.eog"},
