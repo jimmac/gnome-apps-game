@@ -146,16 +146,26 @@ deploy_smbclient() {
 
     info "Deploying via smbclient to $smb_url..."
 
-    # Build smbclient batch commands — remove old game first
+    local local_gamelist
+    local_gamelist=$(mktemp)
+    
+    # 1. Try to fetch existing gamelist.xml
+    smbclient "$smb_url" -N -s /dev/null -c "get roms/ports/gamelist.xml $local_gamelist" 2>/dev/null || true
+
+    # 2. Update it locally
+    update_gamelist_file "$local_gamelist"
+
+    # 3. Build smbclient batch commands — remove old game first
     local batch
     batch=$(mktemp)
     cat > "$batch" <<SMBBATCH
 cd roms\\ports
+mask ""
 del $OLD_GAME_ID\\*
 rmdir $OLD_GAME_ID
 del "$OLD_LAUNCHER"
 mkdir $GAME_ID
-cd roms\\ports\\$GAME_ID
+cd $GAME_ID
 lcd $PROJECT_DIR
 put $LOVE_FILE
 SMBBATCH
@@ -164,16 +174,18 @@ SMBBATCH
         echo "put cover.png" >> "$batch"
     fi
 
-    # Launcher goes into roms/ports/
+    # Launcher and updated gamelist go into roms/ports/
     cat >> "$batch" <<SMBBATCH
 cd /roms\\ports
 lcd $PROJECT_DIR
 put "$LAUNCHER"
+lcd $(dirname "$local_gamelist")
+put $(basename "$local_gamelist") gamelist.xml
 SMBBATCH
 
-    smbclient "$smb_url" -N -b 65520 < "$batch"
+    smbclient "$smb_url" -N -s /dev/null -b 65520 < "$batch"
     local rc=$?
-    rm -f "$batch"
+    rm -f "$batch" "$local_gamelist"
 
     if [ $rc -ne 0 ]; then
         error "smbclient failed (exit $rc). Is KNULLI powered on and on the network?"
@@ -245,9 +257,8 @@ find_target() {
 }
 
 # Update or insert gamelist.xml entry for EmulationStation
-update_gamelist() {
-    local ports_path="$1"
-    local gamelist="$ports_path/gamelist.xml"
+update_gamelist_file() {
+    local gamelist="$1"
 
     python3 - "$gamelist" <<'PYEOF'
 import xml.etree.ElementTree as ET
@@ -264,7 +275,7 @@ meta = {
     "genre": "Quiz",
 }
 
-if os.path.exists(path):
+if os.path.exists(path) and os.path.getsize(path) > 0:
     tree = ET.parse(path)
     root = tree.getroot()
 else:
@@ -355,7 +366,7 @@ deploy_local() {
     fi
 
     # Update gamelist.xml for EmulationStation
-    update_gamelist "$ports_path"
+    update_gamelist_file "$ports_path/gamelist.xml"
     info "Updated gamelist.xml"
 
     # Sync to ensure writes are flushed
