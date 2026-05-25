@@ -69,6 +69,7 @@ return {
   gitte = { name="Gitte", author="Christian Kruse", desc="Simple Git client for GNOME", flatpak="de.wwwtech.gitte"},
   health = { name="Health", author="Rasmus Cogitri Thomsen", desc="Track your fitness goals", flatpak="dev.Cogitri.Health"},
   hieroglyphic = { name="Hieroglyphic", author="FineFindus", desc="Find LaTeX and Typst symbols", flatpak="io.github.finefindus.Hieroglyphic"},
+  identity = { name="Identity", author="Ivan Molodetskikh", desc="Compare images and videos", flatpak="org.gnome.gitlab.YaLTeR.Identity"},
   impression = { name="Impression", author="Khaleel Al-Adhami", desc="Create bootable drives", flatpak="io.gitlab.adhami3310.Impression"},
   iotas = { name="Iotas", author="Chris Heywood", desc="Simple note taking", flatpak="org.gnome.World.Iotas"},
   ["ip-lookup"] = { name="IP Lookup", author="Bytez", desc="Find info about an IP address", flatpak="io.github.bytezz.IPLookup"},
